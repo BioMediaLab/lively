@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "name": "lively-www",
+  "alias": "lively.im",
+  "regions": ["iad1"],
+  "builds": [
+    {
+      "src": "next.config.js",
+      "use": "@now/next"
+    }
+  ]
+}
