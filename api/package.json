@@ -10,9 +10,13 @@
   },
   "dependencies": {
     "express": "^4.16.4",
+    "pg": "^7.9.0",
+    "reflect-metadata": "^0.1.13",
+    "typeorm": "^0.2.16",
     "yoga": "0.0.18"
   },
   "devDependencies": {
+    "@types/express": "^4.16.1",
     "@types/graphql": "^14.0.4",
     "@types/node": "^10.12.11",
     "@types/ws": "^6.0.1",
