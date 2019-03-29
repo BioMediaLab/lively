@@ -1,0 +1,39 @@
+# Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-node-deployment
+  labels:
+    app: lively-api
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: lively-api
+  template:
+    metadata:
+      labels:
+        app: lively-api
+    spec:
+      containers:
+        - name: web
+          image: dieff07/lively_api:initial
+          command: ["yarn", "run", "start"]
+          ports:
+            - containerPort: 4000
+
+---
+# Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: lively-api-balancer
+spec:
+  type: LoadBalancer
+  selector:
+    app: lively-api
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 4000
+      name: http
