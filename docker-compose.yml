@@ -1,0 +1,16 @@
+#intended for local development only
+version: "2.1"
+services:
+  db:
+    image: postgres
+    restart: always
+    volumes:
+      - lively_db:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: "lively"
+      POSTGRES_USER: "lively_db"
+      POSTGRES_PASSWORD: "ac08912lkdx01sd"
+    ports:
+      - "5432:5432"
+volumes:
+  lively_db:
