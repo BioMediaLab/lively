@@ -1,0 +1,8 @@
+version: 2
+jobs:
+  code_checking:
+    docker:
+      - image: node:latest
+    steps:
+      - checkout
+      - run: yarn install
