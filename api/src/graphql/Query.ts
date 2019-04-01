@@ -18,7 +18,7 @@ export const Query = queryType({
     t.list.field('users', {
       type: 'User',
       resolve: (root, args, ctx) => {
-        return ctx.data.users
+        return ctx.knex('users').select('*')
       },
     })
   },
