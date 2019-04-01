@@ -9,16 +9,20 @@ jobs:
       - checkout
       - run: yarn install
       - run: yarn run typecheck
+  docker_web:
+    docker:
+      - image: docker
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run: docker login -u $DOCKER_USER -p $DOCKER_PASS
+      - run: |
+          cd www && docker build -t dieff/lively_web:$CIRCLE_SHA1 .
+          docker run dieff/lively_web:$CIRCLE_SHA1 -- cd www && yarn run typecheck
+      - run: docker push dieff/lively_web:$CIRCLE_SHA1
 workflows:
   version: 2
   master:
     jobs:
       - code_checking
-  build_and_publish_docker_image:
-    jobs:
-      - docker-publish/publish:
-          path: "www"
-          image: "dieff/lively_web"
-      - docker-publish/publish:
-          path: "api"
-          image: "dieff/lively_api"
+      - docker_web
