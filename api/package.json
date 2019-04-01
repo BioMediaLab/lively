@@ -6,7 +6,8 @@
     "build": "yoga build",
     "build:ci": "yarn build",
     "start": "yoga start",
-    "lint": "echo linting disabled"
+    "lint": "echo linting disabled",
+    "typecheck": "tsc -p ."
   },
   "dependencies": {
     "express": "^4.16.4",
