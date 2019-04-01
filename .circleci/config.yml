@@ -15,14 +15,28 @@ jobs:
     steps:
       - checkout
       - setup_remote_docker
-      - run: docker login -u $DOCKER_LOGIN -p $DOCKER_PASSWORD
       - run: |
+          docker login -u $DOCKER_LOGIN -p $DOCKER_PASSWORD
           cd www && docker build -t dieff/lively_web:$CIRCLE_SHA1 .
-          docker run -w /src/www dieff/lively_web:$CIRCLE_SHA1 yarn run typecheck
-      - run: docker push dieff/lively_web:$CIRCLE_SHA1
+          docker push dieff/lively_web:$CIRCLE_SHA1
+  docker_api:
+    docker:
+      - image: docker
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run: |
+          docker login -u $DOCKER_LOGIN -p $DOCKER_PASSWORD
+          cd api && docker build -t dieff/lively_api:$CIRCLE_SHA1 .
+          docker push dieff/lively_api:$CIRCLE_SHA1
 workflows:
   version: 2
   master:
     jobs:
       - code_checking
-      - docker_web
+      - docker_web:
+          requires:
+            - code_checking
+      - docker_api:
+          requires:
+            - code_checking
