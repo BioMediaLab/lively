@@ -1,3 +1,6 @@
+# Creates a Redis server inside the cluster for
+# api to use
+
 # inside the cluster, the redis server will have
 # a DNS name of redis-internal.default
 apiVersion: v1
