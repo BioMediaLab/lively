@@ -2,11 +2,28 @@ import React from "react";
 import initApollo from "./init-apollo";
 import Head from "next/head";
 import { getDataFromTree } from "react-apollo";
+import {
+  AppComponentType,
+  AppComponentContext,
+  AppComponentProps,
+  DefaultAppIProps
+} from "next/app";
+import { NormalizedCacheObject, ApolloClient } from "apollo-boost";
 
-export default App => {
-  return class Apollo extends React.Component {
+export default (
+  App: AppComponentType<
+    {
+      apolloClient: ApolloClient<NormalizedCacheObject>;
+    } & DefaultAppIProps
+  >
+) => {
+  return class Apollo extends React.Component<
+    AppComponentProps & {
+      apolloState: NormalizedCacheObject;
+    } & DefaultAppIProps
+  > {
     static displayName = "withApollo(App)";
-    static async getInitialProps(ctx) {
+    static async getInitialProps(ctx: AppComponentContext) {
       const { Component, router } = ctx;
 
       let appProps = {};
@@ -16,7 +33,7 @@ export default App => {
 
       // Run all GraphQL queries in the component tree
       // and extract the resulting data
-      const apollo = initApollo();
+      const apollo = initApollo(null);
       if (!process.browser) {
         try {
           // Run all GraphQL queries
@@ -26,6 +43,7 @@ export default App => {
               Component={Component}
               router={router}
               apolloClient={apollo}
+              pageProps={appProps}
             />
           );
         } catch (error) {
@@ -49,7 +67,12 @@ export default App => {
       };
     }
 
-    constructor(props) {
+    apolloClient: ApolloClient<NormalizedCacheObject>;
+
+    constructor(
+      props: AppComponentProps &
+        DefaultAppIProps & { apolloState: NormalizedCacheObject }
+    ) {
       super(props);
       this.apolloClient = initApollo(props.apolloState);
     }
