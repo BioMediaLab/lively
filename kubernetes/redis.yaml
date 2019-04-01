@@ -1,0 +1,42 @@
+# Creates a Redis server inside the cluster for
+# api to use
+
+# inside the cluster, the redis server will have
+# a DNS name of redis-internal.default
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-internal
+  labels:
+    app: redis
+spec:
+  ports:
+    - port: 6379
+      name: redis
+  selector:
+    app: redis
+
+---
+# Using a stateful set instead of a pod to make sure that there is only 1
+# running at a time
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: redis-internal
+spec:
+  selector:
+    matchLabels:
+      app: redis # has to match .spec.template.metadata.labels
+  serviceName: redis
+  template:
+    metadata:
+      labels:
+        app: redis # has to match .spec.selector.matchLabels
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+        - name: redis-container
+          image: redis:latest
+          ports:
+            - containerPort: 6379
+              name: redis

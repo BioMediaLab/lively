@@ -23,13 +23,12 @@ spec:
             - containerPort: 4000
 
 ---
-# Service
+#Cluster service
 apiVersion: v1
 kind: Service
 metadata:
-  name: lively-api-balancer
+  name: lively-api-internal
 spec:
-  type: LoadBalancer
   selector:
     app: lively-api
   ports:
@@ -37,3 +36,28 @@ spec:
       port: 80
       targetPort: 4000
       name: http
+
+---
+#Ingress
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: ingress-lively-api
+  annotations:
+    # use the shared ingress-nginx
+    kubernetes.io/ingress.class: "nginx"
+    certmanager.k8s.io/issuer: "letsencrypt-prod"
+    certmanager.k8s.io/acme-challenge-type: http01
+spec:
+  tls:
+    - hosts:
+        - api.lively.im
+      secretName: lively-api-tls
+  rules:
+    - host: api.lively.im
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: lively-api-internal
+              servicePort: 80

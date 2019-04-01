@@ -2,7 +2,7 @@
   "compilerOptions": {
     "module": "commonjs",
     "moduleResolution": "node",
-    "target": "es5",
+    "target": "es6",
     "rootDir": ".",
     "outDir": "dist",
     "sourceMap": true,
@@ -10,10 +10,10 @@
     "noUnusedLocals": true,
     "noUnusedParameters": false,
     "strict": false,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "experimentalDecorators": true
   },
   "include": ["./src/**/*.ts", ".yoga/**/*"],
   "exclude": ["node_modules"],
-  "emitDecoratorMetadata": true,
-  "experimentalDecorators": true
+  "emitDecoratorMetadata": true
 }
