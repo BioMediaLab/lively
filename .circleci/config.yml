@@ -18,7 +18,7 @@ jobs:
       - run: docker login -u $DOCKER_LOGIN -p $DOCKER_PASSWORD
       - run: |
           cd www && docker build -t dieff/lively_web:$CIRCLE_SHA1 .
-          docker run dieff/lively_web:$CIRCLE_SHA1 cd www && yarn run typecheck
+          docker run -w /src/www dieff/lively_web:$CIRCLE_SHA1 yarn run typecheck
       - run: docker push dieff/lively_web:$CIRCLE_SHA1
 workflows:
   version: 2
