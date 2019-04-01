@@ -6,3 +6,8 @@ jobs:
     steps:
       - checkout
       - run: yarn install
+workflows:
+  version: 2
+  master:
+    jobs:
+      - code_checking
