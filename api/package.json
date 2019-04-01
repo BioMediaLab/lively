@@ -1,5 +1,5 @@
 {
-  "name": "minimal",
+  "name": "lively-api",
   "version": "0.0.0",
   "scripts": {
     "dev": "yoga dev",
