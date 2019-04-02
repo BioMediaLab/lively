@@ -11,5 +11,6 @@ export const User = objectType({
   definition(t) {
     t.id('id')
     t.string('name')
+    t.string('email')
   },
 })

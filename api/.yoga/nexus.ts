@@ -19,6 +19,7 @@ export interface NexusGenEnums {
 export interface NexusGenRootTypes {
   Query: {};
   User: { // root type
+    email: string; // String!
     id: string; // ID!
     name: string; // String!
   }
@@ -38,6 +39,7 @@ export interface NexusGenFieldTypes {
     users: NexusGenRootTypes['User'][]; // [User!]!
   }
   User: { // field return type
+    email: string; // String!
     id: string; // ID!
     name: string; // String!
   }
