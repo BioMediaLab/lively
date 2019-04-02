@@ -37,12 +37,15 @@ jobs:
     docker:
       - image: bitnami/kubectl:latest
     steps:
-      - run: |
-          echo $KUBE_CONFIG_DATA >> kube.yaml
-          export API_IMAGE=dieff07/lively_api:$(echo $CIRCLE_SHA1 | cut -c 1-12)
-          export WEB_IMAGE=dieff07/lively_web:$(echo $CIRCLE_SHA1 | cut -c 1-12)
-          kubectl --kubeconfig kube.yaml set image deployments/web-node-deployment web=$WEB_IMAGE
-          kubectl --kubeconfig kube.yaml set image deployments/api-node-deployment api=$API_IMAGE
+      - deploy:
+          name: "kube deploy"
+          working_directory: "/tmp"
+          command: |
+            echo $KUBE_CONFIG_DATA >> kube.yaml
+            export API_IMAGE=dieff07/lively_api:$(echo $CIRCLE_SHA1 | cut -c 1-12)
+            export WEB_IMAGE=dieff07/lively_web:$(echo $CIRCLE_SHA1 | cut -c 1-12)
+            kubectl --kubeconfig kube.yaml set image deployments/web-node-deployment web=$WEB_IMAGE
+            kubectl --kubeconfig kube.yaml set image deployments/api-node-deployment api=$API_IMAGE
 workflows:
   version: 2
   master:
