@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
         - name: web
-          image: dieff07/lively_web:initial
+          image: dieff07/lively_web:latest
           command: ["yarn", "run", "start"]
           ports:
             - containerPort: 3000

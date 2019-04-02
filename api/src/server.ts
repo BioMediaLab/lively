@@ -8,6 +8,10 @@ export default yogaEject({
   async server() {
     const app = express()
 
+    app.get('/healthz', function(req, res) {
+      res.status(200).send('ok')
+    })
+
     const schema = makeSchema({
       types,
       outputs: {
@@ -31,7 +35,6 @@ export default yogaEject({
     })
 
     apolloServer.applyMiddleware({ app, path: '/' })
-
     return app
   },
   async startServer(express) {
@@ -39,7 +42,6 @@ export default yogaEject({
       const httpServer = express
         .listen({ port: 4000 }, () => {
           console.log(`🚀  Server ready at http://localhost:4000/`)
-
           resolve(httpServer)
         })
         .on('error', err => reject(err))

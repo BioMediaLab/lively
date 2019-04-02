@@ -16,11 +16,24 @@ spec:
         app: lively-api
     spec:
       containers:
-        - name: web
-          image: dieff07/lively_api:initial
+        - name: api
+          image: dieff07/lively_api:latest
+          imagePullPolicy: "always"
           command: ["yarn", "run", "start"]
           ports:
             - containerPort: 4000
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 4000
+            initialDelaySeconds: 3
+            prediodSeconds: 5
+          livelinessProbe:
+            httpGet:
+              path: /healthz
+              port: 4000
+            initialDelaySeconds: 3
+            prediodSeconds: 5
 
 ---
 #Cluster service
