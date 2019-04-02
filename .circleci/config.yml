@@ -1,6 +1,4 @@
 version: 2.1
-orbs:
-  docker-publish: circleci/docker-publish@0.1.6
 jobs:
   code_checking:
     docker:
@@ -35,6 +33,16 @@ jobs:
           docker tag api dieff07/lively_api:latest
           docker tag api dieff07/lively_api:$API_TAG
           docker push dieff07/lively_api
+  deploy:
+    docker:
+      - image: bitnami/kubectl:latest
+    steps:
+      - run: |
+          echo $KUBE_CONFIG_DATA >> kube.yaml
+          export API_IMAGE=dieff07/lively_api:$(echo $CIRCLE_SHA1 | cut -c 1-12)
+          export WEB_IMAGE=dieff07/lively_web:$(echo $CIRCLE_SHA1 | cut -c 1-12)
+          kubectl --kubeconfig kube.yaml set image deployments/web-node-deployment web=$WEB_IMAGE
+          kubectl --kubeconfig kube.yaml set image deployments/api-node-deployment api=$API_IMAGE
 workflows:
   version: 2
   master:
@@ -43,6 +51,19 @@ workflows:
       - docker_web:
           requires:
             - code_checking
+          filters:
+            only:
+              - master
       - docker_api:
           requires:
             - code_checking
+          filters:
+            only:
+              - master
+      - deploy:
+          requires:
+            - docker_web
+            - docker_api
+          filters:
+            only:
+              - master
