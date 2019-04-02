@@ -52,18 +52,21 @@ workflows:
           requires:
             - code_checking
           filters:
-            only:
-              - master
+            branches:
+              only:
+                - master
       - docker_api:
           requires:
             - code_checking
           filters:
-            only:
-              - master
+            branches:
+              only:
+                - master
       - deploy:
           requires:
             - docker_web
             - docker_api
           filters:
-            only:
-              - master
+            branches:
+              only:
+                - master
