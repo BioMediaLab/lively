@@ -1,7 +1,7 @@
+import { yogaContext } from 'yoga'
 import { data, Data } from './data'
 import { knex } from './db'
-import console = require('console')
-import { yogaContext } from 'yoga'
+import { getIdFromSession } from './lib/sessions'
 
 export interface Context {
   data: Data
@@ -12,13 +12,15 @@ export interface Context {
   }
 }
 
-export default yogaContext(httpContext => {
+export default yogaContext(async httpContext => {
   const headers = httpContext.req.headers
   const user = {
     logged: headers.session ? true : false,
-    id: '123',
   }
-  console.log('hello!')
+  const id = await getIdFromSession(headers.session)
+  if (id) {
+    ;(user as any).id = id
+  }
   return {
     data,
     knex,

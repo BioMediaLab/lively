@@ -7,7 +7,7 @@ exports.up = function(knex, Promise) {
     t.string('email')
       .notNull()
       .unique()
-    t.string('photo').notNull()
+    t.string('photo').nullable()
     t.dateTime('createdAt').notNull()
     t.dateTime('updatedAt').nullable()
   })
