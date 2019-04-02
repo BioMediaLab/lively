@@ -22,6 +22,18 @@ spec:
           command: ["yarn", "run", "start"]
           ports:
             - containerPort: 4000
+          env:
+            - name: NODE_ENV
+              value: production
+            - name: REDIS_HOST
+              value: redis-internal.default
+            - name: REDIS_PORT
+              value: "6379"
+            - name: PROD_DB_STRING
+              valueFrom:
+                secretKeyRef:
+                  name: prod-db-connect-string
+                  key: PROD_DB_STRING
           readinessProbe:
             httpGet:
               path: /healthz

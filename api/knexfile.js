@@ -18,14 +18,12 @@ module.exports = {
   },
   production: {
     client: 'pg',
-    connection: {
-      database: 'lively',
-      host: process.env.DB_HOST,
-      user: process.env.DB_USER,
-      password: process.env.DB_PASS,
-    },
+    connection: process.env.PROD_DB_STRING,
     migrations: {
       tableName: 'knex_migrations',
+    },
+    seeds: {
+      directory: './seeds/dev',
     },
   },
 }
