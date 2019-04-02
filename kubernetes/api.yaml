@@ -18,7 +18,7 @@ spec:
       containers:
         - name: api
           image: dieff07/lively_api:latest
-          imagePullPolicy: "always"
+          imagePullPolicy: "Always"
           command: ["yarn", "run", "start"]
           ports:
             - containerPort: 4000
@@ -27,13 +27,13 @@ spec:
               path: /healthz
               port: 4000
             initialDelaySeconds: 3
-            prediodSeconds: 5
-          livelinessProbe:
+            periodSeconds: 5
+          livenessProbe:
             httpGet:
               path: /healthz
               port: 4000
-            initialDelaySeconds: 3
-            prediodSeconds: 5
+            initialDelaySeconds: 5
+            periodSeconds: 5
 
 ---
 #Cluster service

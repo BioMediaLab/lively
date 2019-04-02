@@ -1,4 +1,4 @@
-const Knex = require('knex')
+import * as Knex from 'knex'
 const knexConfig = require('../knexfile')
 import { Model } from 'objection'
 

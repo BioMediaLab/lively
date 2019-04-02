@@ -3,6 +3,7 @@
 An open source learning management system for the future.
 
 [![CircleCI](https://circleci.com/gh/BioMediaLab/lively.svg?style=svg)](https://circleci.com/gh/BioMediaLab/lively)
+![Docker Pulls Web](https://img.shields.io/docker/pulls/dieff07/lively_web.svg)
 
 ## Development
 
