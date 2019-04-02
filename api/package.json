@@ -15,9 +15,10 @@
     "@types/node": "^10.12.11",
     "@types/ws": "^6.0.1",
     "express": "^4.16.4",
+    "knex": "^0.16.3",
+    "objection": "^1.6.6",
     "pg": "^7.9.0",
     "reflect-metadata": "^0.1.13",
-    "typeorm": "^0.2.16",
     "yoga": "0.0.18"
   },
   "devDependencies": {
