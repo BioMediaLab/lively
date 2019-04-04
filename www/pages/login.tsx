@@ -2,6 +2,7 @@ import react from "react";
 import { WithApolloClient, withApollo } from "react-apollo";
 import gql from "graphql-tag";
 import { NextContext } from "next";
+import Router from "next/router";
 import { setSessionCookie, getRedirectFrontend } from "../lib/session";
 
 const LOGIN_GOOGLE = gql`
@@ -48,11 +49,10 @@ class Login extends react.Component<WithApolloClient<Props>> {
           const session: string = res.data.loginGoogle.session;
           setSessionCookie(session);
           const redirect = getRedirectFrontend();
-          console.log("redirect time");
           if (redirect) {
-            window.location.replace(redirect);
+            Router.push(redirect);
           } else {
-            window.location.replace(window.location.origin);
+            Router.push("/");
           }
         });
     }

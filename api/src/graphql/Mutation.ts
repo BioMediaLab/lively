@@ -24,15 +24,18 @@ export const Mutation = mutationType({
         let uid: string
         if (ids.length !== 1) {
           // we must create a new user
-          const newUsers = await context.knex('users').insert({
-            email: data.email,
-            firstName: data.given_name,
-            lastName: data.family_name,
-            name: data.name,
-            picture: data.picture,
-          })
+          const newUsers = await context
+            .knex('users')
+            .insert({
+              email: data.email,
+              firstName: data.given_name,
+              lastName: data.family_name,
+              name: data.name,
+              photo: data.picture,
+            })
+            .returning('id')
           console.log(newUsers)
-          uid = newUsers[0].id
+          uid = newUsers[0]
         } else {
           // we already have the user
           uid = ids[0].id

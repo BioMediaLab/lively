@@ -5,8 +5,7 @@ exports.up = function(knex, Promise) {
       .primary()
     t.string('name').notNull()
     t.string('description').nullable()
-    t.dateTime('createdAt').notNull()
-    t.dateTime('updatedAt').nullable()
+    t.dateTime('createdAt').defaultTo(knex.fn.now())
   })
 }
 

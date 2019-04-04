@@ -19,5 +19,15 @@ services:
     ports:
       - "127.0.0.1:6379:6379"
       - "::1:6379:6379"
+  storage:
+    image: "minio/minio"
+    restart: always
+    ports:
+      - "127.0.0.1:9000:9000"
+      - "::1:9000:9000"
+    volumes:
+      - lively_storage:/data
+    command: "server /data"
 volumes:
   lively_db:
+  lively_storage:
