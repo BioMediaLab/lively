@@ -29,11 +29,23 @@ spec:
               value: redis-internal.default
             - name: REDIS_PORT
               value: "6379"
+            - name: GOOGLE_APP_REDIRECT_URL
+              value: "https://lively.im/login"
             - name: PROD_DB_STRING
               valueFrom:
                 secretKeyRef:
                   name: prod-db-connect-string
                   key: PROD_DB_STRING
+            - name: "GOOGLE_APP_SECRET"
+              valueFrom:
+                secretKeyRef:
+                  name: "google-credentials"
+                  key: "app_secret"
+            - name: "GOOGLE_APP_CLIENT_ID"
+              valueFrom:
+                secretKeyRef:
+                  name: "google-credentials"
+                  key: "app_id"
           readinessProbe:
             httpGet:
               path: /healthz

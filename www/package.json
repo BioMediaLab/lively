@@ -8,7 +8,7 @@
     "dev": "next",
     "build": "next build",
     "start": "next start",
-    "typecheck": "tsc --version && tsc -p ."
+    "typecheck": "tsc -p ."
   },
   "dependencies": {
     "@zeit/next-typescript": "^1.1.1",

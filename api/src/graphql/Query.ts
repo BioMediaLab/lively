@@ -1,4 +1,4 @@
-import { queryType, stringArg } from 'yoga'
+import { queryType } from 'yoga'
 import { getRedirectUrl } from '../lib/googleAuth'
 
 /*
