@@ -1,0 +1,19 @@
+{
+  "projects": {
+    "api": {
+      "schemaPath": "api/src/schema.graphql",
+      "extensions": {
+        "endpoints": {
+          "dev": {
+            "url": "http://localhost:4000",
+            "headers": {
+              "session": "JWT HERE. GET ME FROM YOUR BROWSER"
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+
