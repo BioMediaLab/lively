@@ -1,3 +1,5 @@
+import { Query } from "react-apollo";
+import gql from "graphql-tag";
 import styled from "styled-components";
 
 const Title = styled.h1`
@@ -15,5 +17,28 @@ export default () => (
     <Title>
       <img height="50" src="/static/lively@2x.png" alt="lively" />
     </Title>
+    <Query
+      query={gql`
+        query {
+          googleRedirect
+        }
+      `}
+    >
+      {({ data, error, loading }) => {
+        if (error || loading) {
+          return <div>Loading...</div>;
+        }
+        const { googleRedirect } = data;
+        return (
+          <button
+            onClick={() => {
+              window.location.replace(googleRedirect);
+            }}
+          >
+            Login
+          </button>
+        );
+      }}
+    </Query>
   </div>
 );

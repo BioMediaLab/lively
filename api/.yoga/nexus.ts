@@ -17,7 +17,13 @@ export interface NexusGenEnums {
 }
 
 export interface NexusGenRootTypes {
+  Mutation: {};
   Query: {};
+  Session: { // root type
+    id: string; // ID!
+    session?: string | null; // String
+    sessionInfo?: string | null; // String
+  }
   User: { // root type
     email: string; // String!
     id: string; // ID!
@@ -34,9 +40,18 @@ export interface NexusGenAllTypes extends NexusGenRootTypes {
 }
 
 export interface NexusGenFieldTypes {
+  Mutation: { // field return type
+    loginGoogle: NexusGenRootTypes['Session']; // Session!
+    logout: NexusGenRootTypes['Session']; // Session!
+  }
   Query: { // field return type
-    hello: string; // String!
+    googleRedirect: string; // String!
     users: NexusGenRootTypes['User'][]; // [User!]!
+  }
+  Session: { // field return type
+    id: string; // ID!
+    session: string | null; // String
+    sessionInfo: string | null; // String
   }
   User: { // field return type
     email: string; // String!
@@ -46,9 +61,10 @@ export interface NexusGenFieldTypes {
 }
 
 export interface NexusGenArgTypes {
-  Query: {
-    hello: { // args
-      name?: string | null; // String
+  Mutation: {
+    loginGoogle: { // args
+      code?: string | null; // String
+      sessionInfo?: string | null; // String
     }
   }
 }
@@ -58,7 +74,7 @@ export interface NexusGenAbstractResolveReturnTypes {
 
 export interface NexusGenInheritedFields {}
 
-export type NexusGenObjectNames = "Query" | "User";
+export type NexusGenObjectNames = "Mutation" | "Query" | "Session" | "User";
 
 export type NexusGenInputNames = never;
 

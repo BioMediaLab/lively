@@ -1,4 +1,5 @@
 import { queryType, stringArg } from 'yoga'
+import { getRedirectUrl } from '../lib/googleAuth'
 
 /*
 type Query {
@@ -8,11 +9,8 @@ type Query {
 */
 export const Query = queryType({
   definition(t) {
-    t.string('hello', {
-      args: {
-        name: stringArg(),
-      },
-      resolve: (root, { name }) => `Hello ${name}`,
+    t.string('googleRedirect', {
+      resolve: () => getRedirectUrl(),
     })
 
     t.list.field('users', {

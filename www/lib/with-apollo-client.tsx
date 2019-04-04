@@ -10,26 +10,30 @@ import {
 } from "next/app";
 import { NormalizedCacheObject, ApolloClient } from "apollo-boost";
 import { renderToString } from "react-dom/server";
+import { getSessionCookie } from "./session";
 
 export default (
   App: AppComponentType<
     {
       apolloClient: ApolloClient<NormalizedCacheObject>;
+      hasSession: boolean;
     } & DefaultAppIProps
   >
 ) => {
   return class Apollo extends React.Component<
     AppComponentProps & {
       apolloState: NormalizedCacheObject;
+      hasSession: boolean;
     } & DefaultAppIProps
   > {
     static displayName = "withApollo(App)";
     static async getInitialProps(ctx: AppComponentContext) {
       const { Component, router } = ctx;
+      const hasSession = getSessionCookie(ctx) ? true : false;
 
-      let appProps = {};
-      if (App.getInitialProps) {
-        appProps = await App.getInitialProps(ctx);
+      let pageProps = {};
+      if (Component.getInitialProps) {
+        pageProps = await Component.getInitialProps(ctx.ctx);
       }
 
       // Run all GraphQL queries in the component tree
@@ -42,11 +46,11 @@ export default (
             renderFunction: renderToString,
             tree: (
               <App
-                {...appProps}
                 Component={Component}
                 router={router}
                 apolloClient={apollo}
-                pageProps={appProps}
+                pageProps={pageProps}
+                hasSession={hasSession}
               />
             )
           });
@@ -66,8 +70,9 @@ export default (
       const apolloState = apollo.cache.extract();
 
       return {
-        ...appProps,
-        apolloState
+        pageProps,
+        apolloState,
+        hasSession
       };
     }
 
@@ -75,14 +80,23 @@ export default (
 
     constructor(
       props: AppComponentProps &
-        DefaultAppIProps & { apolloState: NormalizedCacheObject }
+        DefaultAppIProps & {
+          apolloState: NormalizedCacheObject;
+          hasSession: boolean;
+        }
     ) {
       super(props);
       this.apolloClient = initApollo(props.apolloState);
     }
 
     render() {
-      return <App {...this.props} apolloClient={this.apolloClient} />;
+      return (
+        <App
+          {...this.props}
+          apolloClient={this.apolloClient}
+          pageProps={this.props.pageProps}
+        />
+      );
     }
   };
 };

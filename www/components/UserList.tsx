@@ -1,6 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 
-function UserList({ users }) {
+interface User {
+  id: string;
+  name: string;
+  email: string;
+}
+
+function UserList({ users }: { users: User[] }) {
   return (
     <ul>
       {users.map(user => (

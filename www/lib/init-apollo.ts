@@ -21,7 +21,7 @@ function create(initialState: NormalizedCacheObject | null) {
     ssrMode: !process.browser, // Disables forceFetch on the server (so queries are only run once)
     link: new HttpLink({
       uri: process.env.API_URL, // Server URL (must be absolute)
-      credentials: "same-origin" // Additional fetch() options like `credentials` or `headers`
+      credentials: "include" // MUST HAVE CORS ENABLED
     }),
     cache: new InMemoryCache().restore(initialState || {})
   });

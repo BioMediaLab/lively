@@ -2,9 +2,23 @@
 ### Do not make changes to this file directly
 
 
+type Mutation {
+  loginGoogle(code: String, sessionInfo: String): Session!
+  logout: Session!
+}
+
 type Query {
-  hello(name: String): String!
+  googleRedirect: String!
   users: [User!]!
+}
+
+type Session {
+  """current user's id"""
+  id: ID!
+
+  """current user's session token"""
+  session: String
+  sessionInfo: String
 }
 
 type User {
