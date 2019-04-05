@@ -29,7 +29,7 @@ export default (
     static displayName = "withApollo(App)";
     static async getInitialProps(ctx: AppComponentContext) {
       const { Component, router } = ctx;
-      const hasSession = getSessionCookie(ctx) ? true : false;
+      const hasSession = getSessionCookie(ctx.ctx) ? true : false;
 
       let pageProps = {};
       if (Component.getInitialProps) {

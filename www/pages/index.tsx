@@ -1,6 +1,5 @@
-import { Query } from "react-apollo";
-import gql from "graphql-tag";
 import styled from "styled-components";
+import makePage from "../lib/makePage";
 
 const Title = styled.h1`
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
@@ -12,33 +11,12 @@ const Title = styled.h1`
   display: block;
 `;
 
-export default () => (
+const Index = () => (
   <div>
     <Title>
       <img height="50" src="/static/lively@2x.png" alt="lively" />
     </Title>
-    <Query
-      query={gql`
-        query {
-          googleRedirect
-        }
-      `}
-    >
-      {({ data, error, loading }) => {
-        if (error || loading) {
-          return <div>Loading...</div>;
-        }
-        const { googleRedirect } = data;
-        return (
-          <button
-            onClick={() => {
-              window.location.replace(googleRedirect);
-            }}
-          >
-            Login
-          </button>
-        );
-      }}
-    </Query>
   </div>
 );
+
+export default makePage(Index);

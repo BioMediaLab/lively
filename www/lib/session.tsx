@@ -1,5 +1,5 @@
-import { NextAppContext } from "next/app";
 import { addHours } from "date-fns";
+import { NextContext } from "next";
 
 const parseCookie = (cookieString: string): { [key: string]: string } => {
   const splitsCookieParts = [];
@@ -35,10 +35,15 @@ const parseCookie = (cookieString: string): { [key: string]: string } => {
   return result;
 };
 
-export const getSessionCookie = (ctx: NextAppContext) => {
+/*
+Usable in getInitialProps for any page component.
+
+Returns the session, or `false`.
+*/
+export const getSessionCookie = (ctx: NextContext) => {
   let cookies;
-  if (ctx.ctx.req && ctx.ctx.req.headers && ctx.ctx.req.headers.cookie) {
-    let cookieData = ctx.ctx.req.headers.cookie;
+  if (ctx.req && ctx.req.headers && ctx.req.headers.cookie) {
+    let cookieData = ctx.req.headers.cookie;
     if (typeof cookieData === "object") {
       cookieData = cookieData[0];
     }
@@ -51,6 +56,9 @@ export const getSessionCookie = (ctx: NextAppContext) => {
   return cookies.session ? cookies.session : false;
 };
 
+/*
+Overwrites any cookie called `session` from the browser.
+*/
 export const deleteSessionFrontend = () => {
   if (!process.browser) {
     throw new Error("attempting to delete cookie on the server.");
