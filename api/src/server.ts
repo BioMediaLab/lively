@@ -44,6 +44,11 @@ export default yogaEject({
     const apolloServer = new ApolloServer.ApolloServer({
       schema,
       context,
+      playground: {
+        settings: {
+          'request.credentials': 'same-origin',
+        },
+      },
     })
 
     apolloServer.applyMiddleware({ app, path: '/', cors: false })

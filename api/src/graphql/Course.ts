@@ -13,10 +13,8 @@ export const Course = objectType({
       args: {
         max: intArg(),
       },
-      resolve: async (root, args, context, ast) => {
+      resolve: async (root, args, context) => {
         const courseId = root.id
-        const y = ast.fieldNodes
-        console.log(y)
         return context
           .knex('courseUsers')
           .where({ course: courseId })
