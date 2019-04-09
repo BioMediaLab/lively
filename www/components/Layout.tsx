@@ -24,7 +24,7 @@ const Layout: React.FunctionComponent<Props> = props => {
     child = (
       <div>
         <HeaderStyles>
-          <div>Lively Courses</div>
+          <div>Lively Classes</div>
           <button
             onClick={() => {
               deleteSessionFrontend();
@@ -73,7 +73,7 @@ const Layout: React.FunctionComponent<Props> = props => {
   return (
     <>
       <Head>
-        <title>Lively Courses</title>
+        <title>Lively Classes</title>
       </Head>
       {child}
     </>

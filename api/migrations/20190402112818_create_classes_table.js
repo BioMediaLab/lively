@@ -1,5 +1,5 @@
 exports.up = function(knex, Promise) {
-  return knex.schema.createTable('courses', t => {
+  return knex.schema.createTable('classes', t => {
     t.increments('id')
       .unsigned()
       .primary()
@@ -13,7 +13,7 @@ exports.down = function(knex, Promise) {
   return Promise.all([
     knex.raw("SET session_replication_role = 'replica';"),
 
-    knex.schema.dropTable('courses'),
+    knex.schema.dropTable('classes'),
 
     knex.raw("SET session_replication_role = 'origin';"),
   ])
