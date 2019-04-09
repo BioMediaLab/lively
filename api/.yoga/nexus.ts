@@ -14,9 +14,20 @@ export interface NexusGenInputs {
 }
 
 export interface NexusGenEnums {
+  CourseRole: "ADMIN" | "ASSISTANT" | "AUDITOR" | "PROFESSOR" | "STUDENT"
 }
 
 export interface NexusGenRootTypes {
+  Course: { // root type
+    description: string; // String!
+    id: string; // String!
+    name: string; // String!
+  }
+  CourseUser: { // root type
+    id: string; // String!
+    role: NexusGenEnums['CourseRole']; // CourseRole!
+    user: NexusGenRootTypes['User']; // User!
+  }
   Mutation: {};
   Query: {};
   Session: { // root type
@@ -37,15 +48,29 @@ export interface NexusGenRootTypes {
 }
 
 export interface NexusGenAllTypes extends NexusGenRootTypes {
+  CourseRole: NexusGenEnums['CourseRole'];
 }
 
 export interface NexusGenFieldTypes {
+  Course: { // field return type
+    description: string; // String!
+    id: string; // String!
+    members: NexusGenRootTypes['CourseUser'][]; // [CourseUser!]!
+    name: string; // String!
+  }
+  CourseUser: { // field return type
+    course: NexusGenRootTypes['Course']; // Course!
+    id: string; // String!
+    role: NexusGenEnums['CourseRole']; // CourseRole!
+    user: NexusGenRootTypes['User']; // User!
+  }
   Mutation: { // field return type
     loginGoogle: NexusGenRootTypes['Session']; // Session!
     logout: NexusGenRootTypes['Session']; // Session!
   }
   Query: { // field return type
     googleRedirect: string; // String!
+    myCourses: NexusGenRootTypes['CourseUser'][]; // [CourseUser!]!
     users: NexusGenRootTypes['User'][]; // [User!]!
   }
   Session: { // field return type
@@ -61,6 +86,11 @@ export interface NexusGenFieldTypes {
 }
 
 export interface NexusGenArgTypes {
+  Course: {
+    members: { // args
+      max?: number | null; // Int
+    }
+  }
   Mutation: {
     loginGoogle: { // args
       code?: string | null; // String
@@ -74,11 +104,11 @@ export interface NexusGenAbstractResolveReturnTypes {
 
 export interface NexusGenInheritedFields {}
 
-export type NexusGenObjectNames = "Mutation" | "Query" | "Session" | "User";
+export type NexusGenObjectNames = "Course" | "CourseUser" | "Mutation" | "Query" | "Session" | "User";
 
 export type NexusGenInputNames = never;
 
-export type NexusGenEnumNames = never;
+export type NexusGenEnumNames = "CourseRole";
 
 export type NexusGenInterfaceNames = never;
 

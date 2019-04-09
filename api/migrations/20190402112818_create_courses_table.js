@@ -5,7 +5,7 @@ exports.up = function(knex, Promise) {
       .primary()
     t.string('name').notNull()
     t.string('description').nullable()
-    t.timestamps()
+    t.timestamps(false, true)
   })
 }
 

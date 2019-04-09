@@ -10,7 +10,7 @@ exports.up = function(knex, Promise) {
     t.integer('course')
       .unsigned()
       .notNullable()
-    t.timestamps()
+    t.timestamps(false, true)
 
     t.foreign('user')
       .references('id')

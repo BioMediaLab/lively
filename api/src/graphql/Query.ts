@@ -18,7 +18,6 @@ export const Query = queryType({
     t.list.field('myCourses', {
       type: CourseUser,
       resolve: async (root, args, context) => {
-        console.log(context.user)
         return context
           .knex('courseUsers')
           .where({ user: context.user.id })
