@@ -1,12 +1,7 @@
 import { queryType } from 'yoga'
 import { getRedirectUrl } from '../lib/googleAuth'
+import { CourseUser } from './CourseUser'
 
-/*
-type Query {
-  hello(name: String!): String!
-  user(name: String!): User!
-}
-*/
 export const Query = queryType({
   definition(t) {
     t.string('googleRedirect', {
@@ -17,6 +12,17 @@ export const Query = queryType({
       type: 'User',
       resolve: (root, args, ctx) => {
         return ctx.knex('users').select('*')
+      },
+    })
+
+    t.list.field('myCourses', {
+      type: CourseUser,
+      resolve: async (root, args, context) => {
+        console.log(context.user)
+        return context
+          .knex('courseUsers')
+          .where({ user: context.user.id })
+          .select('*')
       },
     })
   },

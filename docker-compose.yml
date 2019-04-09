@@ -28,6 +28,18 @@ services:
     volumes:
       - lively_storage:/data
     command: "server /data"
+  pgweb:
+    restart: always
+    image: sosedoff/pgweb
+    ports:
+      - "127.0.0.1:8081:8081"
+      - "::1:8081:8081"
+    links:
+      - db:da
+    environment:
+      - DATABASE_URL=postgres://lively_db:ac08912lkdx01sd@db:5432/postgres?sslmode=disable
+    depends_on:
+      - db
 volumes:
   lively_db:
   lively_storage:

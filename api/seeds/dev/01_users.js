@@ -11,7 +11,6 @@ exports.seed = function(knex, Promise) {
           lastName: 'Kay',
           email: 'andrew.kay@maine.edu',
           siteAdmin: true,
-          createdAt: new Date(),
         },
         {
           name: 'Nick Dieff',
@@ -19,7 +18,6 @@ exports.seed = function(knex, Promise) {
           lastName: 'Dieff',
           email: 'nicholas.dieffenbacherkrall@maine.edu',
           siteAdmin: true,
-          createdAt: new Date(),
         },
         {
           name: 'Enoch Lin',
@@ -27,7 +25,6 @@ exports.seed = function(knex, Promise) {
           lastName: 'Lin',
           email: 'wei.lin@maine.edu',
           siteAdmin: true,
-          createdAt: new Date(),
         },
       ])
     })

@@ -13,7 +13,7 @@ exports.up = function(knex, Promise) {
     t.boolean('siteAdmin').defaultTo(false)
     t.boolean('hasVisited').defaultTo(false)
     t.string('studentID')
-    t.dateTime('createdAt').defaultTo(knex.fn.now())
+    t.timestamps()
   })
 }
 

@@ -2,6 +2,32 @@
 ### Do not make changes to this file directly
 
 
+"""represents one of lively's courses"""
+type Course {
+  description: String!
+
+  """Course ID"""
+  id: String!
+  members(max: Int): [CourseUser!]!
+  name: String!
+}
+
+"""A user's role in a given course"""
+enum CourseRole {
+  ADMIN
+  ASSISTANT
+  AUDITOR
+  PROFESSOR
+  STUDENT
+}
+
+type CourseUser {
+  course: Course!
+  id: String!
+  role: CourseRole!
+  user: User!
+}
+
 type Mutation {
   loginGoogle(code: String, sessionInfo: String): Session!
   logout: Session!
@@ -9,6 +35,7 @@ type Mutation {
 
 type Query {
   googleRedirect: String!
+  myCourses: [CourseUser!]!
   users: [User!]!
 }
 
