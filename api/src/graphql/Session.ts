@@ -8,6 +8,10 @@ export const Session = objectType({
       nullable: true,
       description: "current user's session token",
     })
-    t.string('sessionInfo', { nullable: true })
+    t.string('sessionInfo', {
+      nullable: true,
+      description:
+        'A string describing the context (browser, ip) of the session. So the user can verify it.',
+    })
   },
 })

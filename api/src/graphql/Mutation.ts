@@ -34,7 +34,6 @@ export const Mutation = mutationType({
               photo: data.picture,
             })
             .returning('id')
-          console.log(newUsers)
           uid = newUsers[0]
         } else {
           // we already have the user

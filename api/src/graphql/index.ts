@@ -5,5 +5,5 @@ export * from './enums'
 
 export * from './User'
 export * from './Session'
-export * from './CourseUser'
-export * from './Course'
+export * from './ClassMember'
+export * from './Class'

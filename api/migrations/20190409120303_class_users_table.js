@@ -8,7 +8,7 @@ exports.up = function(knex, Promise) {
       .unsigned()
       .index()
       .references('id')
-      .inTable('classes')
+      .inTable('users')
       .notNull()
     t.bigInteger('class_id')
       .unsigned()

@@ -1,10 +1,10 @@
 import { objectType } from 'yoga'
 import { User } from './User'
-import { CLassRole } from './enums'
+import { ClassRole } from './enums'
 import { Class } from './Class'
 
-export const ClassUser = objectType({
-  name: 'ClassUser',
+export const ClassMember = objectType({
+  name: 'ClassMember',
   definition(t) {
     t.string('id')
     t.field('user', {
@@ -12,8 +12,8 @@ export const ClassUser = objectType({
       resolve: async (root, args, context) => {
         const result = await context
           .knex('class')
-          .join('users', 'class_users.user', '=', 'users.id')
-          .select('users')
+          .join('users', 'class_users.user_id', '=', 'users.id')
+          .select('users.*')
         return result[0]
       },
     })
@@ -23,7 +23,7 @@ export const ClassUser = objectType({
       resolve: async (root, args, context) => {
         const result = await context
           .knex('class_users')
-          .join('classes', 'class_users.class', '=', 'classes.id')
+          .join('classes', 'class_users.class_id', '=', 'classes.id')
           .select('classes.*')
         return result[0]
       },

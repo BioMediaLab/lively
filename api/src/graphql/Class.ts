@@ -1,5 +1,5 @@
 import { objectType, intArg } from 'yoga'
-import { ClassUser } from './ClassUser'
+import { ClassMember } from './ClassMember'
 
 export const Class = objectType({
   name: 'Class',
@@ -9,7 +9,7 @@ export const Class = objectType({
     t.string('name')
     t.string('description')
     t.list.field('members', {
-      type: ClassUser,
+      type: ClassMember,
       args: {
         max: intArg(),
       },

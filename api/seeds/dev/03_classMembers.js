@@ -4,7 +4,7 @@ exports.seed = function(knex, Promise) {
     .del()
     .then(async () => {
       const classes = await knex('classes')
-        .where({ name: 'Grocking and Kicking' })
+        .where({ name: 'Lively 101' })
         .select('id')
       const users = await knex('users')
         .where({ email: 'nicholas.dieffenbacherkrall@maine.edu' })
@@ -14,8 +14,8 @@ exports.seed = function(knex, Promise) {
       // Inserts seed entries
       return knex('class_users').insert([
         {
-          user: userId,
-          class: classId,
+          user_id: userId,
+          class_id: classId,
           role: 'ADMIN',
         },
       ])
