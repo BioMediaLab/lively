@@ -1,23 +1,27 @@
 import { yogaContext } from 'yoga'
 import { data, Data } from './data'
 import { knex } from './db'
+import * as Knex from 'knex/types/knex'
 import { getIdFromSession } from './lib/sessions'
+import { ExpressContext } from 'apollo-server-express/dist/ApolloServer'
 
 export interface Context {
+  express: ExpressContext
   data: Data
-  knex: any
+  knex: Knex
   user: {
-    id?: string
+    id: string
     logged: boolean
   }
 }
 
 export default yogaContext(async httpContext => {
-  const headers = httpContext.req.headers
+  const cookies = httpContext.req.cookies
   const user = {
-    logged: headers.session ? true : false,
+    logged: cookies.session ? true : false,
+    id: '',
   }
-  const id = await getIdFromSession(headers.session)
+  const id = await getIdFromSession(cookies.session)
   if (id) {
     ;(user as any).id = id
   }
@@ -25,5 +29,6 @@ export default yogaContext(async httpContext => {
     data,
     knex,
     user,
+    express: httpContext,
   }
 })

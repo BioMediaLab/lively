@@ -1,6 +1,7 @@
 import gql from "graphql-tag";
 import { useQuery } from "react-apollo-hooks";
 import UserList from "../components/UserList";
+import makePage from "../lib/makePage";
 import Dropzone from "react-dropzone";
 
 const GET_USERS = gql`
@@ -32,4 +33,4 @@ const Users = () => {
   );
 };
 
-export default Users;
+export default makePage(Users);

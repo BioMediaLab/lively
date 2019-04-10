@@ -4,12 +4,16 @@ exports.up = function(knex, Promise) {
       .unsigned()
       .primary()
     t.string('name').notNull()
+    t.string('firstName').notNull()
+    t.string('lastName').notNull()
     t.string('email')
       .notNull()
       .unique()
     t.string('photo').nullable()
-    t.dateTime('createdAt').notNull()
-    t.dateTime('updatedAt').nullable()
+    t.boolean('siteAdmin').defaultTo(false)
+    t.boolean('hasVisited').defaultTo(false)
+    t.string('studentID')
+    t.timestamps(false, true)
   })
 }
 

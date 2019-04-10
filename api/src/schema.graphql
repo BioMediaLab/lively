@@ -2,9 +2,55 @@
 ### Do not make changes to this file directly
 
 
+"""represents one of lively's classes"""
+type Class {
+  description: String!
+
+  """Class ID"""
+  id: String!
+  members(max: Int): [ClassMember!]!
+  name: String!
+}
+
+type ClassMember {
+  class: Class!
+  id: String!
+  role: ClassRole!
+  user: User!
+}
+
+"""A user's role in a given class"""
+enum ClassRole {
+  ADMIN
+  ASSISTANT
+  AUDITOR
+  PROFESSOR
+  STUDENT
+}
+
+type Mutation {
+  loginGoogle(code: String, sessionInfo: String): Session!
+  logout: Session!
+}
+
 type Query {
-  hello(name: String): String!
+  class(class_id: ID): Class!
+  googleRedirect: String!
+  myClasses: [ClassMember!]!
   users: [User!]!
+}
+
+type Session {
+  """current user's id"""
+  id: ID!
+
+  """current user's session token"""
+  session: String
+
+  """
+  A string describing the context (browser, ip) of the session. So the user can verify it.
+  """
+  sessionInfo: String
 }
 
 type User {

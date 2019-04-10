@@ -6,22 +6,25 @@ exports.seed = function(knex, Promise) {
       // Inserts seed entries
       return knex('users').insert([
         {
-          id: 1,
           name: 'Andy Kay',
+          firstName: 'Andy',
+          lastName: 'Kay',
           email: 'andrew.kay@maine.edu',
-          createdAt: new Date(),
+          siteAdmin: true,
         },
         {
-          id: 2,
           name: 'Nick Dieff',
-          email: 'nick.dieff@gmail.com',
-          createdAt: new Date(),
+          firstName: 'Nick',
+          lastName: 'Dieff',
+          email: 'nicholas.dieffenbacherkrall@maine.edu',
+          siteAdmin: true,
         },
         {
-          id: 3,
           name: 'Enoch Lin',
+          firstName: 'Enoch',
+          lastName: 'Lin',
           email: 'wei.lin@maine.edu',
-          createdAt: new Date(),
+          siteAdmin: true,
         },
       ])
     })
