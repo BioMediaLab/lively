@@ -3,8 +3,9 @@ import { NextFunctionComponent } from "next";
 import gql from "graphql-tag";
 import makePage from "../lib/makePage";
 import { useQuery } from "react-apollo-hooks";
+import { Heading } from "rebass";
 import ErrorMessage from "../components/ErrorMessage";
-import { GET_CLASS } from "./__generated__/GET_CLASS";
+import { GET_CLASS, GET_CLASSVariables } from "./__generated__/GET_CLASS";
 
 const GET_CLASS_QUERY = gql`
   query GET_CLASS($classId: ID!) {
@@ -23,9 +24,12 @@ const Classes: NextFunctionComponent<Props> = props => {
   if (!props.classId) {
     return <div>Class Not Found</div>;
   }
-  const { data, error, loading } = useQuery<GET_CLASS>(GET_CLASS_QUERY, {
-    variables: { classId: props.classId }
-  });
+  const { data, error, loading } = useQuery<GET_CLASS, GET_CLASSVariables>(
+    GET_CLASS_QUERY,
+    {
+      variables: { classId: props.classId }
+    }
+  );
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -34,7 +38,7 @@ const Classes: NextFunctionComponent<Props> = props => {
   }
 
   const curClass = data.class;
-  return <div>{curClass.name}</div>;
+  return <Heading>{curClass.name}</Heading>;
 };
 
 Classes.getInitialProps = ctx => {
