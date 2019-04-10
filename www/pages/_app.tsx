@@ -12,6 +12,7 @@ class MyApp extends React.Component<
   } & DefaultAppIProps &
     AppComponentProps
 > {
+  static displayName = "_APP";
   /*
     getIntialProps is not currently configured on this component and will not run.
     See with-apollo-client
