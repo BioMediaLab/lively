@@ -4,7 +4,7 @@ import UserList from "../components/UserList";
 import makePage from "../lib/makePage";
 
 const GET_USERS = gql`
-  {
+  query GET_USERS {
     users {
       id
       name

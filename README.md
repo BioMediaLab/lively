@@ -22,7 +22,7 @@ The following software must be installed to run a local copy of Lively.
 - yarn
 - Docker
 - docker-compose
-- knew cli (`npm i -g knex`)
+- knex cli (`npm i -g knex`)
 
 ### Setup
 
@@ -51,6 +51,18 @@ To run the app, go to the root of the repository and run:
 `yarn run dev`
 
 The api will be available at http://localhost:3000, and the api will be at http://localhost:4000.
+
+### IDE
+
+While developing, you can run the command `yarn run watch` to automatically update generated typescript files.
+
+For developers using VSCode, the following extensions may be helpful:
+
+- Apollo GraphQL (`apollographql.vscode-apollo`) - validation of `gql` queries in front end code
+- Prettier - Code formatter (`esbenp.prettier-vscode`) - automatic code formatting
+- TypeScript Importer (`pmneo.tsimporter`) - Automatic imports for dependencies
+- Cloud Code (`googlecloudtools.cloudcode`) - Helps when using Lively with Kubernetes
+- DotENV (`mikestead.dotenv`) - Syntax highlighting for your `.env` files
 
 ### Useful K8s bits
 

@@ -6,7 +6,7 @@ import Router from "next/router";
 import { setSessionCookie, getRedirectFrontend } from "../lib/session";
 
 const LOGIN_GOOGLE = gql`
-  mutation($code: String!) {
+  mutation LOGIN_GOOGLE($code: String!) {
     loginGoogle(code: $code) {
       session
       id

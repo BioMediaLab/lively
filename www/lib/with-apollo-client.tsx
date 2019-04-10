@@ -29,7 +29,8 @@ export default (
     static displayName = "withApollo(App)";
     static async getInitialProps(ctx: AppComponentContext) {
       const { Component, router } = ctx;
-      const hasSession = getSessionCookie(ctx.ctx) ? true : false;
+      const session = getSessionCookie(ctx.ctx);
+      const hasSession = session ? true : false;
 
       let pageProps = {};
       if (Component.getInitialProps) {
@@ -38,7 +39,10 @@ export default (
 
       // Run all GraphQL queries in the component tree
       // and extract the resulting data
-      const apollo = initApollo(null);
+      const apollo =
+        !process.browser && session
+          ? initApollo(null, session)
+          : initApollo(null);
       if (!process.browser) {
         try {
           // Run all GraphQL queries
