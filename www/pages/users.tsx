@@ -1,6 +1,7 @@
 import gql from "graphql-tag";
 import { useQuery } from "react-apollo-hooks";
 import UserList from "../components/UserList";
+import Dropzone from "react-dropzone";
 
 const GET_USERS = gql`
   {
@@ -26,6 +27,7 @@ const Users = () => {
   return (
     <div>
       <UserList users={data.users} />
+      <Dropzone />
     </div>
   );
 };
