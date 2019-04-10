@@ -12,19 +12,16 @@ services:
       POSTGRES_PASSWORD: "ac08912lkdx01sd"
     ports:
       - "127.0.0.1:5432:5432"
-      - "::1:5432:5432"
   redis:
     image: redis
     restart: always
     ports:
       - "127.0.0.1:6379:6379"
-      - "::1:6379:6379"
   storage:
     image: "minio/minio"
     restart: always
     ports:
       - "127.0.0.1:9000:9000"
-      - "::1:9000:9000"
     volumes:
       - lively_storage:/data
     command: "server /data"
@@ -33,7 +30,6 @@ services:
     image: sosedoff/pgweb
     ports:
       - "127.0.0.1:8081:8081"
-      - "::1:8081:8081"
     links:
       - db:da
     environment:
