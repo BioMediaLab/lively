@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "node server.js",
     "gen-types": "cd .. && apollo client:codegen --target typescript",
-    "build": "yarn gen-types && next build",
+    "build": "next build",
     "start": "NODE_ENV=production node server.js",
     "typecheck": "yarn gen-types && tsc -p .",
     "watch": "npm-watch"
