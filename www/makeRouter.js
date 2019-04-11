@@ -21,6 +21,10 @@ const createRoute = (page, path) => {
     });
 
   const parsePath = curPath => {
+    // trailling slashes break Next
+    if (curPath[curPath.length - 1] === "/") {
+      curPath = curPath.substring(0, curPath.length - 1);
+    }
     const getParams = curPath
       .split("/")
       .map((part, index) => {
@@ -32,18 +36,18 @@ const createRoute = (page, path) => {
       .join("");
 
     return {
-      href: `/${page}/?${getParams}`,
+      href: `/${page}?${getParams}`,
       as: curPath
     };
   };
 
   return {
-    Link: ({ path, prefetch, children }) =>
+    Link: ({ path, children, ...props }) =>
       React.createElement(
         Link.default,
         {
-          prefetch: prefetch ? true : false,
-          ...parsePath(path)
+          ...parsePath(path),
+          ...props
         },
         children
       ),
