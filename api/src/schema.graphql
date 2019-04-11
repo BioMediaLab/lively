@@ -29,6 +29,7 @@ enum ClassRole {
 }
 
 type Mutation {
+  createQuiz(class_id: ID, title: String): Quiz!
   loginGoogle(code: String, sessionInfo: String): Session!
   logout: Session!
 }

@@ -8,7 +8,7 @@ exports.seed = function(knex, Promise) {
       return knex('quizzes').insert([
         {
           class_id: classRecord.id,
-          title: 'quiz',
+          title: 'Quiz 1',
         },
       ])
     })
