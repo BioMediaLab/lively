@@ -2,6 +2,7 @@ import { queryType, idArg } from 'yoga'
 import { getRedirectUrl } from '../lib/googleAuth'
 import { ClassMember } from './ClassMember'
 import { Class } from './Class'
+import { Quiz } from './Quiz'
 
 export const Query = queryType({
   definition(t) {
@@ -37,6 +38,16 @@ export const Query = queryType({
           .knex('class_users')
           .where({ user_id: parseInt(context.user.id, 10) })
           .select('*')
+      },
+    })
+
+    t.list.field('classQuizzes', {
+      type: Quiz,
+      args: {
+        class_id: idArg(),
+      },
+      resolve: async (root, args, context) => {
+        return context.knex('quizzes').where('class_id', args.class_id)
       },
     })
   },
