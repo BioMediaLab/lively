@@ -3,7 +3,7 @@ import gql from "graphql-tag";
 import { useQuery } from "react-apollo-hooks";
 import ErrorMessage from "./ErrorMessage";
 import { MY_CLASSES } from "./__generated__/MY_CLASSES";
-import Link from "next/link";
+import { classesRoute } from "../routes";
 
 const MY_CLASSES_QUERY = gql`
   query MY_CLASSES {
@@ -29,14 +29,14 @@ const ClassList: FunctionComponent = () => {
     return <div>Loading...</div>;
   }
 
+  const Link = classesRoute.Link;
+  //console.log(test);
+
   return (
     <div>
       {data.myClasses.map(cl => (
-        <Link
-          href={`/classes?course_id=${cl.class.id}`}
-          as={`/classes/${cl.class.id}`}
-        >
-          <div>{cl.class.name}</div>
+        <Link path={`/classes/${cl.class.id}`} prefetch={false}>
+          <a>{cl.class.name}</a>
         </Link>
       ))}
     </div>
