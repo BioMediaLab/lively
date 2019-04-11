@@ -5,7 +5,6 @@ import ErrorMessage from "./ErrorMessage";
 import { MY_CLASSES } from "./__generated__/MY_CLASSES";
 import { classesRoute } from "../routes";
 import styled from "styled-components";
-import Link from "next/link";
 
 const MY_CLASSES_QUERY = gql`
   query MY_CLASSES {
@@ -27,7 +26,6 @@ const List = styled.div`
 
 const ListItem = styled.div`
   height: 2rem;
-  box-sizing: border-box;
   display: flex;
   justify-content: space-around;
 
@@ -60,7 +58,6 @@ const ClassList: FunctionComponent = () => {
   }
 
   const ClassesLink = classesRoute.Link;
-  //console.log(test);
 
   return (
     <List>

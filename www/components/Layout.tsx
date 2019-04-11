@@ -6,6 +6,7 @@ import { Image, Button } from "rebass";
 import { deleteSessionFrontend } from "../lib/session";
 import Login from "./Login";
 import Drawer from "./Drawer";
+import ClassList from "./ClassList";
 
 const HeaderStyles = styled.header`
   display: flex;
@@ -35,7 +36,9 @@ const Layout: React.FunctionComponent<Props> = props => {
     child = (
       <div>
         <HeaderStyles>
-          <Drawer />
+          <Drawer>
+            <ClassList />
+          </Drawer>
           <Logo>
             <Link href="/">
               <Image
@@ -53,6 +56,9 @@ const Layout: React.FunctionComponent<Props> = props => {
           >
             Logout
           </Button>
+          <Link href="/settings">
+            <button>Settings</button>
+          </Link>
         </HeaderStyles>
         <main style={{ paddingTop: "5rem" }}>{props.children}</main>
       </div>

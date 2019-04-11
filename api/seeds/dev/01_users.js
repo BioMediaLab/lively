@@ -26,6 +26,14 @@ exports.seed = function(knex, Promise) {
           email: 'wei.lin@maine.edu',
           siteAdmin: true,
         },
+        {
+          name: 'Jeremiah User',
+          firstName: 'Jeremiah',
+          lastName: 'User',
+          email: 'ju@maine.edu',
+          photo:
+            'https://en.meming.world/images/en/thumb/2/2b/Unsettled_Tom.jpg/300px-Unsettled_Tom.jpg',
+        },
       ])
     })
 }

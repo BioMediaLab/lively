@@ -19,7 +19,11 @@ const CreateQuiz: FunctionComponent = () => {
       title: "wooo hooo"
     }
   });
-  return <div>CreateQuiz</div>;
+  return (
+    <div>
+      CreateQuiz <button onClick={() => quiz()}>Create</button>
+    </div>
+  );
 };
 
 export default CreateQuiz;

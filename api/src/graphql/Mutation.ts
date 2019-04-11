@@ -3,7 +3,6 @@ import { Session } from './Session'
 import { setCredentialsFromCode, getProfileData } from '../lib/googleAuth'
 import { addSession, deleteSession } from '../lib/sessions'
 import { Quiz } from './Quiz'
-import console = require('console')
 
 export const Mutation = mutationType({
   definition(t) {
