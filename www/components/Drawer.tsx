@@ -7,6 +7,10 @@ const MainDrawer = styled.div<{ open: boolean }>`
   width: 20rem;
   height: 100vh;
   display: ${props => (props.open ? "default" : "none")};
+  position: fixed;
+  background-color: pink;
+  left: 0;
+  height: 100vh;
 `;
 
 const Drawer: FunctionComponent = props => {
@@ -15,7 +19,12 @@ const Drawer: FunctionComponent = props => {
   return (
     <>
       <Button onClick={() => setOpen(!open)}>O</Button>
-      <MainDrawer open={open}>{props.children}</MainDrawer>
+      <MainDrawer open={open}>
+        <div>
+          <Button onClick={() => setOpen(false)}>Close</Button>
+          {props.children}
+        </div>
+      </MainDrawer>
     </>
   );
 };
