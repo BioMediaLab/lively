@@ -87,8 +87,13 @@ export const Mutation = mutationType({
       },
       resolve: async (root, args, context) => {
         console.log(args)
-        const { stream, mimetype, filename, encoding } = await args.pic.file
-        console.log(`The filename is ${filename}`)
+        const { createReadStream, mimetype, filename } = await args.pic.file
+        console.log(`The filename is ${filename} and the type is ${mimetype}`)
+        const url = await context.objectStorage.uploadFile(
+          createReadStream(),
+          mimetype,
+        )
+        console.log(url)
         return context
           .knex('users')
           .where({ id: context.user.id })

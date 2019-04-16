@@ -4,11 +4,15 @@ import { knex } from './db'
 import * as Knex from 'knex/types/knex'
 import { getIdFromSession } from './lib/sessions'
 import { ExpressContext } from 'apollo-server-express/dist/ApolloServer'
+import { ObjectStorage } from './lib/fileStorage'
+
+const objectStorage = new ObjectStorage()
 
 export interface Context {
   express: ExpressContext
   data: Data
   knex: Knex
+  objectStorage: ObjectStorage
   user: {
     id: string
     logged: boolean
@@ -39,6 +43,7 @@ export default yogaContext(async httpContext => {
     data,
     knex,
     user,
+    objectStorage,
     express: httpContext,
   }
 })
