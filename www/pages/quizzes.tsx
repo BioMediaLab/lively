@@ -40,7 +40,6 @@ const Quizzes = () => {
       },
       data: { classQuizzes: [...classQuizzes, createQuiz] }
     });
-    console.log("test");
   };
 
   if (loading) {

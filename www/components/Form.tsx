@@ -14,7 +14,9 @@ const Form = ({
   return (
     <FormikProvider value={formik}>
       <form onSubmit={formik.handleSubmit} {...props}>
-        <Fieldset disabled={formik.isSubmitting}>{children}</Fieldset>
+        <Fieldset disabled={formik.isSubmitting} formik={formik}>
+          {children}
+        </Fieldset>
       </form>
     </FormikProvider>
   );

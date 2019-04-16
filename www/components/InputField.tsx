@@ -6,6 +6,7 @@ import Input from "./Input";
 
 const InputField = ({ label, name, onChange, ...props }) => {
   const [field, meta] = useField(name);
+
   const errorText = meta.touch && meta.error;
 
   return (

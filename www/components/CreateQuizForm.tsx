@@ -1,14 +1,11 @@
 import React, { useState, useEffect, useRef, FunctionComponent } from "react";
 import { useMutation } from "react-apollo-hooks";
 import gql from "graphql-tag";
-import { Editor, EditorState } from "draft-js";
-import styled from "styled-components";
-import { stateToHTML } from "draft-js-export-html";
-import { Text, Button } from "rebass";
-import Input from "./Input";
+import { Button } from "rebass";
 import Form from "./Form";
 import InputField from "./InputField";
-import { GET_QUIZZES_QUERY } from "../pages/quizzes";
+import DraftjsField from "./DraftjsField";
+import Draft, { EditorState } from "draft-js";
 
 const CREATE_QUIZ_MUTATION = gql`
   mutation createQuiz($class_id: ID!, $title: String!) {
@@ -20,45 +17,24 @@ const CREATE_QUIZ_MUTATION = gql`
   }
 `;
 
-const EditorWrapper = styled.div`
-  height: 200px;
-  border: 1px solid #f8f8f8;
-`;
-
 const CreateQuiz: FunctionComponent = ({ updateCache }) => {
-  const [editorState, setEditorState] = useState(EditorState.createEmpty());
-  const editor = useRef(null);
-
-  function focusEditor() {
-    editor.current.focus();
-  }
-
-  useEffect(() => {
-    focusEditor();
-  }, []);
-
   const quiz = useMutation(CREATE_QUIZ_MUTATION, {
     update: updateCache
   });
+  const [editorState] = React.useState(() =>
+    EditorState.createWithContent(emptyContentState)
+  );
+
+  console.log("render");
 
   return (
     <div>
-      <EditorWrapper>
-        <Editor
-          ref={editor}
-          editorState={editorState}
-          onChange={editorState => setEditorState(editorState)}
-        />
-      </EditorWrapper>
-      <pre>{stateToHTML(editorState.getCurrentContent())}</pre>
-
       <Form
-        initialValues={{ title: "" }}
+        initialValues={{
+          title: "",
+          descriptionState: editorState
+        }}
         onSubmit={async values => {
-          // const result = await fetch('my-api/authenticate')
-          // do whatever you'd like to
-          // return result
-          // and SUCCESS 🎉
           quiz({
             variables: {
               class_id: 2,
@@ -75,7 +51,7 @@ const CreateQuiz: FunctionComponent = ({ updateCache }) => {
           fontSize={4}
           mb={4}
         />
-
+        <DraftjsField name="descriptionState" />
         <Button type="submit" primary>
           Create
         </Button>
@@ -83,5 +59,17 @@ const CreateQuiz: FunctionComponent = ({ updateCache }) => {
     </div>
   );
 };
+
+const emptyContentState = Draft.convertFromRaw({
+  entityMap: {},
+  blocks: [
+    {
+      text: "",
+      key: "foo",
+      type: "unstyled",
+      entityRanges: []
+    }
+  ]
+});
 
 export default CreateQuiz;
