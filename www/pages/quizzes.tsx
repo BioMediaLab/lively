@@ -1,32 +1,38 @@
 import gql from "graphql-tag";
 import { useQuery } from "react-apollo-hooks";
-import makePage from "../lib/makePage";
+import { GET_QUIZZES } from "./__generated__/GET_QUIZZES";
 import QuizList from "../components/QuizList";
+import ErrorMessage from "../components/ErrorMessage";
+import CreateQuiz from "../components/CreateQuiz";
 
-const GET_QUIZZES = gql`
-  {
-    quizzes {
+const GET_QUIZZES_QUERY = gql`
+  query GET_QUIZZES($class_id: ID!) {
+    classQuizzes(class_id: $class_id) {
       id
+      title
     }
   }
 `;
 
 const Quizzes = () => {
-  const { data, error, loading } = useQuery(GET_QUIZZES);
+  const { data, error, loading } = useQuery<GET_QUIZZES>(GET_QUIZZES_QUERY, {
+    variables: { class_id: 2 }
+  });
 
   if (loading) {
     return <div>Loading...</div>;
   }
 
-  if (error) {
-    return <div>Error! {error.message}</div>;
+  if (error || !data) {
+    return <ErrorMessage apolloErr={error} />;
   }
 
   return (
     <div>
-      <QuizList quizzes={data.quizzes} />
+      <CreateQuiz />
+      <QuizList quizzes={data.classQuizzes} />
     </div>
   );
 };
 
-export default makePage(Quizzes);
+export default Quizzes;

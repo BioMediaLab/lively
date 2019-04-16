@@ -4,9 +4,13 @@ import gql from "graphql-tag";
 import { NextContext } from "next";
 import Router from "next/router";
 import { setSessionCookie, getRedirectFrontend } from "../lib/session";
+import {
+  LOGIN_GOOGLEVariables,
+  LOGIN_GOOGLE
+} from "./__generated__/LOGIN_GOOGLE";
 
-const LOGIN_GOOGLE = gql`
-  mutation($code: String!) {
+const LOGIN_GOOGLE_MUTE = gql`
+  mutation LOGIN_GOOGLE($code: String!) {
     loginGoogle(code: $code) {
       session
       id
@@ -37,16 +41,16 @@ class Login extends react.Component<WithApolloClient<Props>> {
   componentDidMount() {
     if (this.props.hasGoogleCode && this.props.googleCode) {
       this.props.client
-        .mutate({
-          mutation: LOGIN_GOOGLE,
+        .mutate<LOGIN_GOOGLE, LOGIN_GOOGLEVariables>({
+          mutation: LOGIN_GOOGLE_MUTE,
           variables: { code: this.props.googleCode }
         })
         .then(res => {
           console.log(res);
-          if (res.errors) {
+          if (res.errors || !res.data) {
             throw new Error("login failed");
           }
-          const session: string = res.data.loginGoogle.session;
+          const session: string = res.data.loginGoogle.session as string;
           setSessionCookie(session);
           const redirect = getRedirectFrontend();
           if (redirect) {

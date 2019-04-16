@@ -1,17 +1,29 @@
 import React from "react";
 import styled from "styled-components";
 import Head from "next/head";
-import { Query } from "react-apollo";
-import gql from "graphql-tag";
-import { deleteSessionFrontend, setRedirCookie } from "../lib/session";
+import Link from "next/link";
+import { Image, Button } from "rebass";
+import { deleteSessionFrontend } from "../lib/session";
+import Login from "./Login";
+import Drawer from "./Drawer";
+import ClassList from "./ClassList";
 
 const HeaderStyles = styled.header`
   display: flex;
-  color: blue;
+  height: 3rem;
   padding: 1rem;
-  border-bottom: 0.1rem solid black;
-  margin-left: -0.5rem;
-  margin-right: -1rem;
+  background-color: #fcff77;
+  box-shadow: 0 0.25rem 0.25rem teal;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  align-items: center;
+`;
+
+const Logo = styled.div`
+  margin-left: 2rem;
+  width: 15%;
 `;
 
 interface Props {
@@ -24,50 +36,35 @@ const Layout: React.FunctionComponent<Props> = props => {
     child = (
       <div>
         <HeaderStyles>
-          <div>Lively Classes</div>
-          <button
+          <Drawer>
+            <ClassList />
+          </Drawer>
+          <Logo>
+            <Link href="/">
+              <Image
+                width={[1, 1, 1 / 2]}
+                src="/static/lively@2x.png"
+                alt="lively"
+              />
+            </Link>
+          </Logo>
+          <Button
             onClick={() => {
               deleteSessionFrontend();
               window.location.reload(true);
             }}
           >
             Logout
-          </button>
+          </Button>
+          <Link href="/settings">
+            <button>Settings</button>
+          </Link>
         </HeaderStyles>
-        <main>{props.children}</main>
+        <main style={{ paddingTop: "5rem" }}>{props.children}</main>
       </div>
     );
   } else {
-    child = (
-      <div>
-        <Query
-          query={gql`
-            query {
-              googleRedirect
-            }
-          `}
-        >
-          {({ data, error, loading }) => {
-            if (error || loading) {
-              return <div>Loading...</div>;
-            }
-            const { googleRedirect } = data;
-            return (
-              <button
-                onClick={() => {
-                  // set the redirect cookie
-                  setRedirCookie();
-                  // and then send the user to Google
-                  window.location.replace(googleRedirect);
-                }}
-              >
-                Login
-              </button>
-            );
-          }}
-        </Query>
-      </div>
-    );
+    child = <Login />;
   }
 
   return (

@@ -1,26 +1,19 @@
-import styled from "styled-components";
-import Link from "next/link";
-import makePage from "../lib/makePage";
 import { NextFunctionComponent } from "next";
-
-const Title = styled.h1`
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
-    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
-    sans-serif;
-
-  text-rendering: optimizeLegibility;
-  padding: 0 20px;
-  display: block;
-`;
+import makePage from "../lib/makePage";
+import ClassList from "../components/ClassList";
+import { Heading } from "rebass";
 
 const Index: NextFunctionComponent = () => (
-  <div>
-    <Title>
-      <img height="50" src="/static/lively@2x.png" alt="lively" />
-    </Title>
-    <Link href="/settings">
-      <a>Settings</a>
-    </Link>
+  <div
+    style={{
+      backgroundImage:
+        "url(https://res.cloudinary.com/teepublic/image/private/s--r4xoF8Zx--/t_Preview/b_rgb:ffffff,c_limit,f_jpg,h_630,q_90,w_630/v1484033673/production/designs/1090200_1.jpg)",
+      width: "100%",
+      height: "90vh"
+    }}
+  >
+    <Heading>My Classes</Heading>
+    <ClassList />
   </div>
 );
 

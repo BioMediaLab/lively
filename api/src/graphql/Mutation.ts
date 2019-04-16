@@ -1,7 +1,8 @@
-import { mutationType, stringArg } from 'yoga'
+import { mutationType, stringArg, idArg } from 'yoga'
 import { Session } from './Session'
 import { setCredentialsFromCode, getProfileData } from '../lib/googleAuth'
 import { addSession, deleteSession } from '../lib/sessions'
+import { Quiz } from './Quiz'
 
 export const Mutation = mutationType({
   definition(t) {
@@ -55,6 +56,25 @@ export const Mutation = mutationType({
         return {
           id: context.user.id,
         }
+      },
+    })
+
+    t.field('createQuiz', {
+      type: Quiz,
+      args: {
+        class_id: idArg(),
+        title: stringArg(),
+      },
+      resolve: async (root, { class_id, title }, context) => {
+        const [quiz] = await context
+          .knex('quizzes')
+          .insert({
+            class_id,
+            title,
+          })
+          .returning('*')
+
+        return quiz
       },
     })
   },

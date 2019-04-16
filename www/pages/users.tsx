@@ -3,9 +3,11 @@ import { useQuery } from "react-apollo-hooks";
 import UserList from "../components/UserList";
 import ProfilePic from "../components/ProfilePic";
 import makePage from "../lib/makePage";
+import { GET_USERS } from "./__generated__/GET_USERS";
+import ErrorMessage from "../components/ErrorMessage";
 
 const GET_USERS = gql`
-  {
+  query GET_USERS {
     users {
       id
       name
@@ -15,14 +17,14 @@ const GET_USERS = gql`
 `;
 
 const Users = () => {
-  const { data, error, loading } = useQuery(GET_USERS);
+  const { data, error, loading } = useQuery<GET_USERS>(GET_USERS);
 
   if (loading) {
     return <div>Loading...</div>;
   }
 
-  if (error) {
-    return <div>Error! {error.message}</div>;
+  if (error || !data) {
+    return <ErrorMessage apolloErr={error} />;
   }
 
   return (

@@ -6,6 +6,7 @@ exports.seed = function(knex, Promise) {
       // Inserts seed entries
       return knex('classes').insert([
         { name: 'Lively 101', description: 'Welcome to Lively!' },
+        { name: 'Bio 100', description: 'Where you learn about Biology' },
       ])
     })
 }

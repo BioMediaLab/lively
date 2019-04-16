@@ -29,15 +29,23 @@ enum ClassRole {
 }
 
 type Mutation {
+  createQuiz(class_id: ID, title: String): Quiz!
   loginGoogle(code: String, sessionInfo: String): Session!
   logout: Session!
 }
 
 type Query {
   class(class_id: ID): Class!
+  classQuizzes(class_id: ID): [Quiz!]!
   googleRedirect: String!
   myClasses: [ClassMember!]!
   users: [User!]!
+}
+
+type Quiz {
+  class_id: ID!
+  id: ID!
+  title: String!
 }
 
 type Session {

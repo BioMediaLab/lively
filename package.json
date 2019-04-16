@@ -8,6 +8,7 @@
   },
   "scripts": {
     "predev": "yarn install",
+    "watch": "wsrun watch",
     "dev": "wsrun dev",
     "test": "wsrun test",
     "lint": "tslint -p tslint.json",

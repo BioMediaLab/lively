@@ -17,13 +17,23 @@ export interface Context {
 
 export default yogaContext(async httpContext => {
   const cookies = httpContext.req.cookies
+  let session: any = false
+  if (cookies.session) {
+    session = cookies.session
+  } else if (httpContext.req.headers.session) {
+    session = httpContext.req.headers.session
+  }
   const user = {
-    logged: cookies.session ? true : false,
+    logged: session ? true : false,
     id: '',
   }
-  const id = await getIdFromSession(cookies.session)
-  if (id) {
-    ;(user as any).id = id
+  if (session) {
+    const id = await getIdFromSession(session)
+    if (id) {
+      ;(user as any).id = id
+    } else if (cookies.session) {
+      throw new Error('invalid ID!')
+    }
   }
   return {
     data,
