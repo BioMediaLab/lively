@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { Editor, EditorState } from "draft-js";
 import styled from "styled-components";
 import { useField, useFormikContext } from "formik";
+import "draft-js/dist/Draft.css";
 
 const EditorWrapper = styled.div`
   height: 200px;
