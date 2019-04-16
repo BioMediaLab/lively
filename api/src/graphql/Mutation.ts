@@ -1,8 +1,10 @@
-import { mutationType, stringArg, idArg } from 'yoga'
+import { mutationType, stringArg, idArg, arg } from 'yoga'
 import { Session } from './Session'
 import { setCredentialsFromCode, getProfileData } from '../lib/googleAuth'
 import { addSession, deleteSession } from '../lib/sessions'
 import { Quiz } from './Quiz'
+import { User } from './User'
+import { FileUpload } from './inputs'
 
 export const Mutation = mutationType({
   definition(t) {
@@ -75,6 +77,22 @@ export const Mutation = mutationType({
           .returning('*')
 
         return quiz
+      },
+    })
+
+    t.field('updateProfilePic', {
+      type: User,
+      args: {
+        pic: arg({ type: FileUpload, required: true }),
+      },
+      resolve: async (root, args, context) => {
+        console.log(args)
+        const { stream, mimetype, filename, encoding } = await args.pic.file
+        console.log(`The filename is ${filename}`)
+        return context
+          .knex('users')
+          .where({ id: context.user.id })
+          .first()
       },
     })
   },

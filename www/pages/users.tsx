@@ -6,7 +6,7 @@ import makePage from "../lib/makePage";
 import { GET_USERS } from "./__generated__/GET_USERS";
 import ErrorMessage from "../components/ErrorMessage";
 
-const GET_USERS = gql`
+const GET_USERS_AST = gql`
   query GET_USERS {
     users {
       id
@@ -17,7 +17,7 @@ const GET_USERS = gql`
 `;
 
 const Users = () => {
-  const { data, error, loading } = useQuery<GET_USERS>(GET_USERS);
+  const { data, error, loading } = useQuery<GET_USERS>(GET_USERS_AST);
 
   if (loading) {
     return <div>Loading...</div>;
