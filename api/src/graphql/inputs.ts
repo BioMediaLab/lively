@@ -9,6 +9,7 @@ export const Upload = asNexusMethod(GraphQLUpload, 'upload')
 export const FileUpload = inputObjectType({
   name: 'FileUpload',
   definition(t) {
+    // @ts-ignore: this is defined by the `asNexusMethod` call above
     t.upload('file')
 
     // users may wish to give the uploaded context a custom name.
