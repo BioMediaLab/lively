@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useRef, FunctionComponent } from "react";
 import { useMutation } from "react-apollo-hooks";
 import gql from "graphql-tag";
-import { Button } from "rebass";
+import { Heading, Button } from "rebass";
 import Form from "./Form";
 import InputField from "./InputField";
 import DraftjsField from "./DraftjsField";
 import Draft, { EditorState } from "draft-js";
+import CreateQuestions from "./CreateQuestions";
 
 const CREATE_QUIZ_MUTATION = gql`
   mutation createQuiz($class_id: ID!, $title: String!) {
@@ -29,10 +30,13 @@ const CreateQuiz: FunctionComponent = ({ updateCache }) => {
 
   return (
     <div>
+      <Heading>Create Quiz</Heading>
+
       <Form
         initialValues={{
           title: "",
-          descriptionState: editorState
+          descriptionState: editorState,
+          questions: [{ title: "Quiz 1" }]
         }}
         onSubmit={async values => {
           quiz({
@@ -51,7 +55,11 @@ const CreateQuiz: FunctionComponent = ({ updateCache }) => {
           fontSize={4}
           mb={4}
         />
+
         <DraftjsField name="descriptionState" />
+
+        <CreateQuestions />
+
         <Button type="submit" primary>
           Create
         </Button>

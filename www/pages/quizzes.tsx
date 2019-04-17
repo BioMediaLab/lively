@@ -5,6 +5,7 @@ import QuizList from "../components/QuizList";
 import ErrorMessage from "../components/ErrorMessage";
 import CreateQuiz from "../components/CreateQuizForm";
 import Container from "../components/Container";
+import makePage from "../lib/makePage";
 
 export const GET_QUIZZES_QUERY = gql`
   query GET_QUIZZES($class_id: ID!) {
@@ -58,4 +59,4 @@ const Quizzes = () => {
   );
 };
 
-export default Quizzes;
+export default makePage(Quizzes);
