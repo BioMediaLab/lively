@@ -36,7 +36,7 @@ const CreateQuiz: FunctionComponent = ({ updateCache }) => {
         initialValues={{
           title: "",
           descriptionState: editorState,
-          questions: [{ title: "Quiz 1" }]
+          questions: []
         }}
         onSubmit={async values => {
           quiz({
