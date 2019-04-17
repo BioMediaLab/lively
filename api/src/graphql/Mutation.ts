@@ -6,7 +6,6 @@ import { Quiz } from './Quiz'
 import { User } from './User'
 import { FileUpload } from './inputs'
 import { ClassFile } from './ClassFile'
-import console = require('console')
 
 export const Mutation = mutationType({
   definition(t) {

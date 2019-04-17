@@ -15,7 +15,7 @@ export const ClassFile = objectType({
 
     t.string('file_name')
 
-    t.string('description')
+    t.string('description', { nullable: true })
 
     t.field('creator', {
       type: User,

@@ -25,6 +25,13 @@ const ClassFiles: React.FC<Props> = ({ class_id }) => {
           class {
             id
             name
+            files {
+              id
+              mimetype
+              url
+              file_name
+              description
+            }
           }
         }
       }
@@ -50,6 +57,9 @@ const ClassFiles: React.FC<Props> = ({ class_id }) => {
   return (
     <div>
       Class Files for {data.myClassRole.class.name} {upload}
+      {data.myClassRole.class.files.map(file => (
+        <div>{file.file_name}</div>
+      ))}
     </div>
   );
 };

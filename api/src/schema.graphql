@@ -16,7 +16,7 @@ type Class {
 type ClassFile {
   class: Class!
   creator: User!
-  description: String!
+  description: String
   file_key: String!
   file_name: String!
   id: ID!
