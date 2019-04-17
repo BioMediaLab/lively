@@ -12,6 +12,7 @@ const GET_USERS_AST = gql`
       id
       name
       email
+      photo
     }
   }
 `;
@@ -26,11 +27,12 @@ const Users = () => {
   if (error || !data) {
     return <ErrorMessage apolloErr={error} />;
   }
+  console.log(data.users);
 
   return (
     <div>
       <UserList users={data.users} />
-      <ProfilePic />
+      <ProfilePic user={data.users[data.users.length - 1]} />
     </div>
   );
 };
