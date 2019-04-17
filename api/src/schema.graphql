@@ -5,11 +5,23 @@
 """represents one of lively's classes"""
 type Class {
   description: String!
+  files(max: Int): [ClassFile!]!
 
   """Class ID"""
   id: String!
   members(max: Int): [ClassMember!]!
   name: String!
+}
+
+type ClassFile {
+  class: Class!
+  creator: User!
+  description: String!
+  file_key: String!
+  file_name: String!
+  id: ID!
+  mimetype: String!
+  url: String!
 }
 
 type ClassMember {
@@ -34,17 +46,27 @@ input FileUpload {
 }
 
 type Mutation {
+  cloneClassFile(new_class_id: ID, old_file: ID): ClassFile!
   createQuiz(class_id: ID, title: String): Quiz!
+  deleteClassFile(file_id: ID!): ClassFile!
   loginGoogle(code: String, sessionInfo: String): Session!
   logout: Session!
+  updateClassFile(description: String, file_id: ID, name: String): ClassFile!
   updateProfilePic(pic: FileUpload!): User!
+  uploadClassFile(class_id: ID, description: String, file: FileUpload!): ClassFile!
 }
 
 type Query {
   class(class_id: ID): Class!
   classQuizzes(class_id: ID): [Quiz!]!
   googleRedirect: String!
-  myClasses: [ClassMember!]!
+  myClasses(
+    """
+    Return only classes where the user has a given role, such as "Admin"
+    """
+    role: ClassRole
+  ): [ClassMember!]!
+  myClassRole(class_id: ID): ClassMember!
   users: [User!]!
 }
 

@@ -7,6 +7,20 @@ interface Props {
   apolloErr?: ApolloError | undefined;
 }
 
+/** 
+A component to handle the error messages that you deal with when using
+apollo-react. You can pass it the ApolloError object and it will handle 
+all the TS stuff.
+
+Example:
+```
+const {error, loading, data} = useQuery(myQuery);
+
+if (error) {
+  return <ErrorMessage apolloErr={error} />
+}
+```
+*/
 const ErrorMessage: FunctionComponent<Props> = ({ message, apolloErr }) => {
   if (message) {
     return <Text color="red">{message}</Text>;

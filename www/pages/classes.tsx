@@ -6,6 +6,8 @@ import { useQuery } from "react-apollo-hooks";
 import { Heading } from "rebass";
 import ErrorMessage from "../components/ErrorMessage";
 import { GET_CLASS, GET_CLASSVariables } from "./__generated__/GET_CLASS";
+import { classSettings } from "../routes";
+import ClassFiles from "../components/ClassFiles";
 
 const GET_CLASS_QUERY = gql`
   query GET_CLASS($classId: ID!) {
@@ -38,7 +40,15 @@ const Classes: NextFunctionComponent<Props> = props => {
   }
 
   const curClass = data.class;
-  return <Heading>{curClass.name}</Heading>;
+  return (
+    <div>
+      <Heading>{curClass.name}</Heading>
+      <classSettings.Link path={`/classes/${props.classId}/settings`}>
+        <a>Settings</a>
+      </classSettings.Link>
+      <ClassFiles class_id={props.classId} />
+    </div>
+  );
 };
 
 Classes.getInitialProps = ctx => {

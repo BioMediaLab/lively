@@ -4,11 +4,11 @@ import { S3 } from 'aws-sdk'
 import { randomBytes } from 'crypto'
 import { promisify } from 'util'
 
-const randomString = promisify(randomBytes)
+const makeRandBytes = promisify(randomBytes)
 
 const setupClient = () => {
   if (!process.env.FILE_STORAGE_ENDPOINT) {
-    throw new Error('NO Object Storage Endpoint')
+    throw new Error('No Object Storage Endpoint')
   }
   return new AWS.S3({
     accessKeyId: process.env.FILE_STORAGE_ID,
@@ -19,16 +19,63 @@ const setupClient = () => {
   })
 }
 
+interface IUploadFileResult {
+  url: string
+  key: string
+  bucket: string
+}
+
+/**
+ * A friendly singleton interface to the s3 api
+ *
+ */
 export class ObjectStorage {
   client: S3
   constructor() {
     this.client = setupClient()
   }
-  uploadFile = async (file: Stream, type: string): Promise<string> => {
-    const Key = (await randomString(32)).toString('hex')
+
+  getUrl(bucket: string, key: string) {
+    return `${this.client.endpoint.href}/${bucket}/${key}`
+  }
+
+  uploadFile = async (
+    file: Stream,
+    type: string,
+  ): Promise<IUploadFileResult> => {
+    const Key = (await makeRandBytes(32)).toString('hex')
     const result = await this.client
       .upload({ Body: file, Bucket: 'test', Key, ContentType: type })
       .promise()
-    return result.Location
+    return { url: result.Location, key: Key, bucket: 'test' }
+  }
+
+  cloneFile = async (fileKey: string): Promise<IUploadFileResult> => {
+    const newKey = (await makeRandBytes(32)).toString('hex')
+    await this.client
+      .copyObject({
+        Bucket: 'test',
+        Key: newKey,
+        CopySource: `/test/${fileKey}`,
+      })
+      .promise()
+    return {
+      url: this.getUrl('test', newKey),
+      key: newKey,
+      bucket: 'test',
+    }
+  }
+
+  /**
+   * Returns whether or not the file was successfully deleted.
+   */
+  deleteFile = async (fileKey: string): Promise<boolean> => {
+    const result = await this.client
+      .deleteObject({ Bucket: 'test', Key: fileKey })
+      .promise()
+    if (result) {
+      return true
+    }
+    return false
   }
 }
