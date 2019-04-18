@@ -7,6 +7,7 @@ import {
   UploadClassFilesMuteVariables
 } from "./__generated__/UploadClassFilesMute";
 import styled from "styled-components";
+import { QuickClassFiles } from "./__generated__/QuickClassFiles";
 
 const uploadFile = gql`
   mutation UploadClassFilesMute($file: FileUpload!, $class: ID!) {
@@ -16,13 +17,14 @@ const uploadFile = gql`
       file_key
       file_name
       mimetype
+      description
     }
   }
 `;
 
 const UploadUIBody = styled.div`
   width: 30rem;
-  height: 20rem;
+  height: 15rem;
   padding: 0.5rem;
   display: flex;
   border: 0.1rem solid #049b00;
@@ -83,7 +85,35 @@ const ClassContextUpload: React.FC<Props> = ({ class_id }) => {
   const mutate = useMutation<
     UploadClassFilesMute,
     UploadClassFilesMuteVariables
-  >(uploadFile);
+  >(uploadFile, {
+    update: (proxy, result) => {
+      const updateCacheQuery = gql`
+        query QuickClassFiles($classId: ID!) {
+          class(class_id: $classId) {
+            id
+            files {
+              id
+              file_name
+              description
+              mimetype
+            }
+          }
+        }
+      `;
+      const cur = proxy.readQuery<QuickClassFiles>({
+        query: updateCacheQuery,
+        variables: { classId: class_id }
+      });
+      if (cur && result.data) {
+        cur.class.files.push(result.data.uploadClassFile);
+        proxy.writeQuery({
+          query: updateCacheQuery,
+          variables: { classId: class_id },
+          data: cur
+        });
+      }
+    }
+  });
 
   const [state, updateState] = useState<State>(initialState);
 
@@ -119,7 +149,7 @@ const ClassContextUpload: React.FC<Props> = ({ class_id }) => {
   });
 
   let uploadBoxMessage =
-    "Drag some files here or click to select files from your storage.";
+    "Drag a file here or click to select files from your storage.";
   if (!isDragActive) {
     uploadBoxMessage = "Click to choose a file from your storage.";
   }

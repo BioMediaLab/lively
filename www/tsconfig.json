@@ -16,5 +16,6 @@
     "preserveConstEnums": true,
     "sourceMap": true,
     "strictFunctionTypes": false
-  }
+  },
+  "exclude": ["**/node_modules/*"]
 }
