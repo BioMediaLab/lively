@@ -3,6 +3,7 @@ import { Stream } from 'stream'
 import { S3 } from 'aws-sdk'
 import { randomBytes } from 'crypto'
 import { promisify } from 'util'
+import console = require('console')
 
 const makeRandBytes = promisify(randomBytes)
 
