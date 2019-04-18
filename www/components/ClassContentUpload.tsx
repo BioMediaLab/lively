@@ -7,14 +7,13 @@ import {
   UploadClassFilesMuteVariables
 } from "./__generated__/UploadClassFilesMute";
 import styled from "styled-components";
-import { QuickClassFiles } from "./__generated__/QuickClassFiles";
+import { testClassFiles } from "./__generated__/testClassFiles";
 
 const uploadFile = gql`
   mutation UploadClassFilesMute($file: FileUpload!, $class: ID!) {
     uploadClassFile(file: $file, class_id: $class) {
       id
       url
-      file_key
       file_name
       mimetype
       description
@@ -87,29 +86,30 @@ const ClassContextUpload: React.FC<Props> = ({ class_id }) => {
     UploadClassFilesMuteVariables
   >(uploadFile, {
     update: (proxy, result) => {
-      const updateCacheQuery = gql`
-        query QuickClassFiles($classId: ID!) {
-          class(class_id: $classId) {
+      const updateFragment = gql`
+        fragment testClassFiles on Class {
+          files {
             id
-            files {
-              id
-              file_name
-              description
-              mimetype
-            }
+            file_name
+            description
+            url
+            mimetype
           }
         }
       `;
-      const cur = proxy.readQuery<QuickClassFiles>({
-        query: updateCacheQuery,
-        variables: { classId: class_id }
+
+      const oldData = proxy.readFragment<testClassFiles>({
+        id: `Class:${class_id}`,
+        fragment: updateFragment
       });
-      if (cur && result.data) {
-        cur.class.files.push(result.data.uploadClassFile);
-        proxy.writeQuery({
-          query: updateCacheQuery,
-          variables: { classId: class_id },
-          data: cur
+
+      if (oldData && result.data) {
+        oldData.files.push(result.data.uploadClassFile);
+
+        proxy.writeFragment({
+          id: `Class:${class_id}`,
+          fragment: updateFragment,
+          data: oldData
         });
       }
     }

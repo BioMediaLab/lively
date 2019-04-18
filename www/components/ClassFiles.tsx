@@ -8,6 +8,23 @@ import {
 } from "./__generated__/ClassFilesQuery";
 import ClassContentUpload from "./ClassContentUpload";
 
+interface FLIProps {
+  name: string;
+  url: string;
+  id: string;
+}
+
+const FileListItem: React.FC<FLIProps> = props => {
+  return (
+    <div>
+      {props.name}
+      <a target="_blank" href={props.url}>
+        View
+      </a>
+    </div>
+  );
+};
+
 interface Props {
   class_id: string;
 }
@@ -58,7 +75,12 @@ const ClassFiles: React.FC<Props> = ({ class_id }) => {
     <div>
       Class Files for {data.myClassRole.class.name} {upload}
       {data.myClassRole.class.files.map(file => (
-        <div>{file.file_name}</div>
+        <FileListItem
+          key={file.id}
+          name={file.file_name}
+          url={file.url}
+          id={file.id}
+        />
       ))}
     </div>
   );

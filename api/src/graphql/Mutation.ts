@@ -93,6 +93,7 @@ export const Mutation = mutationType({
         const { createReadStream, mimetype, filename } = await args.file.file
         const name = args.file.name ? args.file.name : filename
         const { url, key, bucket } = await context.objectStorage.uploadFile(
+          context.objectStorage.getPublicBucket(),
           createReadStream(),
           mimetype,
         )
@@ -127,7 +128,10 @@ export const Mutation = mutationType({
         if (!file) {
           throw new Error(`File ${args.file_id} could not be found`)
         }
-        const status = await context.objectStorage.deleteFile(file.file_key)
+        const status = await context.objectStorage.deleteFile(
+          context.objectStorage.getPublicBucket(),
+          file.file_key,
+        )
         if (!status) {
           throw new Error(
             `Failed to remove file with key ${
@@ -180,7 +184,12 @@ export const Mutation = mutationType({
           .first()
         const class_id = new_class_id ? new_class_id : oldFile.class_id
 
-        const newFile = await ctx.objectStorage.cloneFile(oldFile.file_key)
+        const bucket = ctx.objectStorage.getPublicBucket()
+        const newFile = await ctx.objectStorage.cloneFile(
+          oldFile.file_key,
+          bucket,
+          bucket,
+        )
         const inserts = await ctx
           .knex('class_files')
           .insert({
@@ -208,6 +217,7 @@ export const Mutation = mutationType({
         const { createReadStream, mimetype, filename } = await args.pic.file
         console.log(`The filename is ${filename} and the type is ${mimetype}`)
         const { url } = await context.objectStorage.uploadFile(
+          context.objectStorage.getPublicBucket(),
           createReadStream(),
           mimetype,
         )
