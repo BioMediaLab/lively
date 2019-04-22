@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, FunctionComponent } from "react";
 import { useMutation } from "react-apollo-hooks";
 import gql from "graphql-tag";
-import { Heading, Button } from "rebass";
+import { Box, Heading, Button } from "rebass";
 import Form from "./Form";
 import InputField from "./InputField";
 import DraftjsField from "./DraftjsField";
@@ -56,7 +56,9 @@ const CreateQuiz: FunctionComponent = ({ updateCache }) => {
           mb={4}
         />
 
-        <DraftjsField name="descriptionState" />
+        <Box mb={4}>
+          <DraftjsField name="descriptionState" />
+        </Box>
 
         <CreateQuestions />
 

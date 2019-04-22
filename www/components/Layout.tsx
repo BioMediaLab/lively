@@ -8,6 +8,13 @@ import Login from "./Login";
 import Drawer from "./Drawer";
 import ClassList from "./ClassList";
 
+const RootWrapper = styled.div`
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+    sans-serif;
+  text-rendering: optimizeLegibility;
+`;
+
 const HeaderStyles = styled.header`
   display: flex;
   height: 3rem;
@@ -73,16 +80,8 @@ const Layout: React.FunctionComponent<Props> = props => {
         <title>Lively Classes</title>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta charSet="utf-8" />
-        <style jsx global>{`
-          body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
-              "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans",
-              "Helvetica Neue", sans-serif;
-            text-rendering: optimizeLegibility;
-          }
-        `}</style>
       </Head>
-      {child}
+      <RootWrapper>{child}</RootWrapper>
     </>
   );
 };
