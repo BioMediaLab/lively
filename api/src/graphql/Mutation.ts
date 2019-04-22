@@ -1,4 +1,4 @@
-import { mutationType, stringArg, idArg, arg } from 'yoga'
+import { mutationType, stringArg, idArg, arg, booleanArg } from 'yoga'
 import { Session } from './Session'
 import { setCredentialsFromCode, getProfileData } from '../lib/googleAuth'
 import { addSession, deleteSession } from '../lib/sessions'
@@ -59,6 +59,26 @@ export const Mutation = mutationType({
         return {
           id: context.user.id,
         }
+      },
+    })
+
+    t.field('updateAdmin', {
+      type: User,
+      args: {
+        user_id: idArg({ nullable: true }),
+        setAdmin: booleanArg(),
+      },
+      resolve: async (_, args, context) => {
+        if (!args.user_id && args.setAdmin) {
+          throw new Error('cannot change a different users admin priveleges')
+        }
+        let uid = args.user_id ? args.user_id : context.user.id
+        const updatedUser = await context
+          .knex('users')
+          .where({ id: uid })
+          .update({ siteAdmin: args.setAdmin })
+          .returning('*')
+        return updatedUser[0]
       },
     })
 

@@ -9,6 +9,16 @@ export const Class = objectType({
     t.string('id', { description: 'Class ID' })
     t.string('name')
     t.string('description')
+    t.field('myRole', {
+      type: ClassMember,
+      resolve: async (root, _, context) => {
+        return context
+          .knex('class_users')
+          .where({ class_id: root.id })
+          .andWhere({ user_id: context.user.id })
+          .first()
+      },
+    })
     t.list.field('members', {
       type: ClassMember,
       args: {
@@ -20,6 +30,7 @@ export const Class = objectType({
         return context
           .knex('class_users')
           .where({ class_id: classId })
+          .orderBy('name')
           .limit(limit)
           .select('*')
       },
@@ -34,6 +45,7 @@ export const Class = objectType({
         return context
           .knex('class_files')
           .where({ class_id: root.id })
+          .orderBy('file_name')
           .limit(limit)
           .select('*')
       },

@@ -15,6 +15,10 @@ export const ClassFile = objectType({
 
     t.string('file_name')
 
+    t.string('class_id')
+
+    t.string('uploader_id')
+
     t.string('description', { nullable: true })
 
     t.field('creator', {
@@ -32,11 +36,11 @@ export const ClassFile = objectType({
     t.field('class', {
       type: Class,
       resolve: async (root, _, context) => {
+        // assuming that the upstream resolver will just return
+        // the whole db object
         return context
-          .knex('class_files')
-          .where({ id: root.id })
-          .join('classes', 'class_files.class_id', '=', 'classes.id')
-          .select('classes.*')
+          .knex('classes')
+          .where({ id: root.class_id })
           .first()
       },
     })

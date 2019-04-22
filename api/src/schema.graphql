@@ -10,17 +10,20 @@ type Class {
   """Class ID"""
   id: String!
   members(max: Int): [ClassMember!]!
+  myRole: ClassMember!
   name: String!
 }
 
 type ClassFile {
   class: Class!
+  class_id: String!
   creator: User!
   description: String
   file_key: String!
   file_name: String!
   id: ID!
   mimetype: String!
+  uploader_id: String!
   url: String!
 }
 
@@ -51,6 +54,7 @@ type Mutation {
   deleteClassFile(file_id: ID!): ClassFile!
   loginGoogle(code: String, sessionInfo: String): Session!
   logout: Session!
+  updateAdmin(setAdmin: Boolean, user_id: ID): User!
   updateClassFile(description: String, file_id: ID, name: String): ClassFile!
   updateProfilePic(pic: FileUpload!): User!
   uploadClassFile(class_id: ID, description: String, file: FileUpload!): ClassFile!
@@ -58,8 +62,10 @@ type Mutation {
 
 type Query {
   class(class_id: ID): Class!
+  classFile(file_id: ID): ClassFile!
   classQuizzes(class_id: ID): [Quiz!]!
   googleRedirect: String!
+  me: User!
   myClasses(
     """
     Return only classes where the user has a given role, such as "Admin"
@@ -96,4 +102,5 @@ type User {
   email: String!
   id: ID!
   name: String!
+  siteAdmin: Boolean!
 }

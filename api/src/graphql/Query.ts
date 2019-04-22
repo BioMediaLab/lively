@@ -4,6 +4,8 @@ import { ClassMember } from './ClassMember'
 import { Class } from './Class'
 import { Quiz } from './Quiz'
 import { ClassRole } from './enums'
+import { ClassFile } from './ClassFile'
+import { User } from './User'
 
 export const Query = queryType({
   definition(t) {
@@ -39,6 +41,15 @@ export const Query = queryType({
       },
     })
 
+    t.field('me', {
+      type: User,
+      resolve: async (_, __, ctx) =>
+        ctx
+          .knex('users')
+          .where({ id: ctx.user.id })
+          .first(),
+    })
+
     t.list.field('users', {
       type: 'User',
       resolve: (root, args, ctx) => {
@@ -63,6 +74,18 @@ export const Query = queryType({
           .andWhere(args.role ? { role: args.role } : {})
           .select('*')
       },
+    })
+
+    t.field('classFile', {
+      type: ClassFile,
+      args: {
+        file_id: idArg(),
+      },
+      resolve: async (_, { file_id }, ctx) =>
+        ctx
+          .knex('class_files')
+          .where({ id: file_id })
+          .first(),
     })
 
     t.list.field('classQuizzes', {

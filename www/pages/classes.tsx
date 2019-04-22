@@ -44,6 +44,7 @@ const Classes: NextFunctionComponent<Props> = props => {
   return (
     <div>
       <Heading>{curClass.name}</Heading>
+      <p>{curClass.description}</p>
       <classSettings.Link path={`/classes/${props.classId}/settings`}>
         <a>Settings</a>
       </classSettings.Link>

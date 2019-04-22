@@ -7,11 +7,16 @@ import {
   UploadClassFilesMuteVariables
 } from "./__generated__/UploadClassFilesMute";
 import styled from "styled-components";
-import { testClassFiles } from "./__generated__/testClassFiles";
+import { testClassFiles } from "../queries/__generated__/testClassFiles";
+import { classFilesFragment } from "../queries/classFiles";
 
 const uploadFile = gql`
-  mutation UploadClassFilesMute($file: FileUpload!, $class: ID!) {
-    uploadClassFile(file: $file, class_id: $class) {
+  mutation UploadClassFilesMute(
+    $file: FileUpload!
+    $class: ID!
+    $desc: String
+  ) {
+    uploadClassFile(file: $file, class_id: $class, description: $desc) {
       id
       url
       file_name
@@ -86,21 +91,9 @@ const ClassContextUpload: React.FC<Props> = ({ class_id }) => {
     UploadClassFilesMuteVariables
   >(uploadFile, {
     update: (proxy, result) => {
-      const updateFragment = gql`
-        fragment testClassFiles on Class {
-          files {
-            id
-            file_name
-            description
-            url
-            mimetype
-          }
-        }
-      `;
-
       const oldData = proxy.readFragment<testClassFiles>({
         id: `Class:${class_id}`,
-        fragment: updateFragment
+        fragment: classFilesFragment
       });
 
       if (oldData && result.data) {
@@ -108,7 +101,7 @@ const ClassContextUpload: React.FC<Props> = ({ class_id }) => {
 
         proxy.writeFragment({
           id: `Class:${class_id}`,
-          fragment: updateFragment,
+          fragment: classFilesFragment,
           data: oldData
         });
       }
@@ -137,7 +130,8 @@ const ClassContextUpload: React.FC<Props> = ({ class_id }) => {
     mutate({
       variables: {
         file: { file: state.curFile, name: state.nameField },
-        class: class_id
+        class: class_id,
+        desc: state.descField.length > 2 ? state.descField : null
       }
     });
     updateState(initialState);

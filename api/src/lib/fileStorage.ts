@@ -88,6 +88,10 @@ export class ObjectStorage {
     return `${this.client.endpoint.href}/${bucket}/${key}`
   }
 
+  /**
+   * The system will have a publicly accessable bucket configured.
+   * You can get it's name here.
+   */
   getPublicBucket(): string {
     if (!process.env.PUBLIC_STORAGE_BUCKET) {
       throw new Error('Missing env var $PUBLIC_STORAGE_BUCKET')
