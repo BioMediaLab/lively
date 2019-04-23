@@ -11,7 +11,7 @@ import {
 interface User {
   id: string;
   name: string;
-  photo: string;
+  photo_url: string;
 }
 
 const ProfilePic = ({ user }: { user: User }) => {
@@ -19,19 +19,19 @@ const ProfilePic = ({ user }: { user: User }) => {
     mutation UpdateProfilePic($file: FileUpload!) {
       updateProfilePic(pic: $file) {
         id
-        photo
+        photo_url
       }
     }
   `);
 
-  const avatar = user.photo ? (
+  const avatar = user.photo_url ? (
     <Image
       style={{
         borderRadius: 60,
         width: 100,
         height: 100
       }}
-      src={user.photo}
+      src={user.photo_url}
     />
   ) : (
     <p

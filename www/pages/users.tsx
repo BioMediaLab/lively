@@ -12,7 +12,7 @@ const GET_USERS_AST = gql`
       id
       name
       email
-      photo
+      photo_url
     }
   }
 `;
@@ -22,7 +22,7 @@ const GET_ME = gql`
     me {
       id
       name
-      photo
+      photo_url
     }
   }
 `;

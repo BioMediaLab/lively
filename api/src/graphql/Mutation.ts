@@ -36,7 +36,7 @@ export const Mutation = mutationType({
               firstName: data.given_name,
               lastName: data.family_name,
               name: data.name,
-              photo: data.picture,
+              photo_url: data.picture,
             })
             .returning('id')
           uid = newUsers[0]
@@ -234,18 +234,29 @@ export const Mutation = mutationType({
         pic: arg({ type: FileUpload, required: true }),
       },
       resolve: async (root, args, context) => {
-        console.log(args)
         const { createReadStream, mimetype, filename } = await args.pic.file
-        console.log(`The filename is ${filename} and the type is ${mimetype}`)
-        const { url } = await context.objectStorage.uploadFile(
+        const { url, key } = await context.objectStorage.uploadFile(
           context.objectStorage.getPublicBucket(),
           createReadStream(),
           mimetype,
         )
+
+        context
+          .knex('users')
+          .whereNotNull('photo_key')
+          .andWhere({ id: context.user.id })
+          .first()
+          .then(async row => {
+            await context.objectStorage.deleteFile(
+              context.objectStorage.getPublicBucket(),
+              row.photo_key,
+            )
+          })
+
         const newPic = await context
           .knex('users')
           .where({ id: context.user.id })
-          .update({ photo: url })
+          .update({ photo_key: key, photo_url: url })
           .returning('*')
         return newPic[0]
       },
