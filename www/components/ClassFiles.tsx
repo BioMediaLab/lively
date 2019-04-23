@@ -7,6 +7,12 @@ import {
   ClassFilesQueryVariables
 } from "./__generated__/ClassFilesQuery";
 import ClassContentUpload from "./ClassContentUpload";
+import FileListItem from "./FileListItem";
+import styled from "styled-components";
+
+const ListBody = styled.div`
+  width: 80%;
+`;
 
 interface Props {
   class_id: string;
@@ -25,6 +31,13 @@ const ClassFiles: React.FC<Props> = ({ class_id }) => {
           class {
             id
             name
+            files(max: 1000) {
+              id
+              mimetype
+              url
+              file_name
+              description
+            }
           }
         }
       }
@@ -39,17 +52,31 @@ const ClassFiles: React.FC<Props> = ({ class_id }) => {
   if (loading) {
     return <div>Loading...</div>;
   }
-  const role = data.myClassRole.role;
-  const upload =
-    role === "ADMIN" || role == "PROFESSOR" ? (
-      <ClassContentUpload class_id={class_id} />
-    ) : (
-      <span />
-    );
+  const amAdmin =
+    data.myClassRole.role === "ADMIN" || data.myClassRole.role === "PROFESSOR";
+
+  const upload = amAdmin ? (
+    <ClassContentUpload class_id={class_id} />
+  ) : (
+    <span />
+  );
 
   return (
     <div>
-      Class Files for {data.myClassRole.class.name} {upload}
+      <h4>Class Files for {data.myClassRole.class.name}</h4>
+      {upload}
+      <ListBody>
+        {data.myClassRole.class.files.map(file => (
+          <FileListItem
+            key={file.id}
+            name={file.file_name}
+            url={file.url}
+            id={file.id}
+            admin={amAdmin}
+            classId={class_id}
+          />
+        ))}
+      </ListBody>
     </div>
   );
 };

@@ -11,7 +11,7 @@ export const ClassMember = objectType({
       type: User,
       resolve: async (root, args, context) => {
         return context
-          .knex('class')
+          .knex('class_users')
           .join('users', 'class_users.user_id', '=', 'users.id')
           .select('users.*')
           .first()

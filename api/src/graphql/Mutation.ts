@@ -1,4 +1,4 @@
-import { mutationType, stringArg, idArg, arg } from 'yoga'
+import { mutationType, stringArg, idArg, arg, booleanArg } from 'yoga'
 import { Session } from './Session'
 import { setCredentialsFromCode, getProfileData } from '../lib/googleAuth'
 import { addSession, deleteSession } from '../lib/sessions'
@@ -6,7 +6,6 @@ import { Quiz } from './Quiz'
 import { User } from './User'
 import { FileUpload } from './inputs'
 import { ClassFile } from './ClassFile'
-import console = require('console')
 
 export const Mutation = mutationType({
   definition(t) {
@@ -63,6 +62,26 @@ export const Mutation = mutationType({
       },
     })
 
+    t.field('updateAdmin', {
+      type: User,
+      args: {
+        user_id: idArg({ nullable: true }),
+        setAdmin: booleanArg(),
+      },
+      resolve: async (_, args, context) => {
+        if (!args.user_id && args.setAdmin) {
+          throw new Error('cannot change a different users admin priveleges')
+        }
+        let uid = args.user_id ? args.user_id : context.user.id
+        const updatedUser = await context
+          .knex('users')
+          .where({ id: uid })
+          .update({ siteAdmin: args.setAdmin })
+          .returning('*')
+        return updatedUser[0]
+      },
+    })
+
     t.field('createQuiz', {
       type: Quiz,
       args: {
@@ -94,6 +113,7 @@ export const Mutation = mutationType({
         const { createReadStream, mimetype, filename } = await args.file.file
         const name = args.file.name ? args.file.name : filename
         const { url, key, bucket } = await context.objectStorage.uploadFile(
+          context.objectStorage.getPublicBucket(),
           createReadStream(),
           mimetype,
         )
@@ -128,7 +148,10 @@ export const Mutation = mutationType({
         if (!file) {
           throw new Error(`File ${args.file_id} could not be found`)
         }
-        const status = await context.objectStorage.deleteFile(file.file_key)
+        const status = await context.objectStorage.deleteFile(
+          context.objectStorage.getPublicBucket(),
+          file.file_key,
+        )
         if (!status) {
           throw new Error(
             `Failed to remove file with key ${
@@ -181,7 +204,12 @@ export const Mutation = mutationType({
           .first()
         const class_id = new_class_id ? new_class_id : oldFile.class_id
 
-        const newFile = await ctx.objectStorage.cloneFile(oldFile.file_key)
+        const bucket = ctx.objectStorage.getPublicBucket()
+        const newFile = await ctx.objectStorage.cloneFile(
+          oldFile.file_key,
+          bucket,
+          bucket,
+        )
         const inserts = await ctx
           .knex('class_files')
           .insert({
@@ -209,6 +237,7 @@ export const Mutation = mutationType({
         const { createReadStream, mimetype, filename } = await args.pic.file
         console.log(`The filename is ${filename} and the type is ${mimetype}`)
         const { url } = await context.objectStorage.uploadFile(
+          context.objectStorage.getPublicBucket(),
           createReadStream(),
           mimetype,
         )

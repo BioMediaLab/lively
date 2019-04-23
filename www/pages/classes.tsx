@@ -12,6 +12,7 @@ import ClassFiles from "../components/ClassFiles";
 const GET_CLASS_QUERY = gql`
   query GET_CLASS($classId: ID!) {
     class(class_id: $classId) {
+      id
       name
       description
     }
@@ -43,6 +44,7 @@ const Classes: NextFunctionComponent<Props> = props => {
   return (
     <div>
       <Heading>{curClass.name}</Heading>
+      <p>{curClass.description}</p>
       <classSettings.Link path={`/classes/${props.classId}/settings`}>
         <a>Settings</a>
       </classSettings.Link>

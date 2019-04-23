@@ -13,5 +13,9 @@ export const User = objectType({
     t.string('name')
     t.string('email')
     t.string('photo', { nullable: true })
+    t.string('firstName')
+    t.string('lastName')
+    t.boolean('siteAdmin')
+    t.boolean('hasVisited')
   },
 })

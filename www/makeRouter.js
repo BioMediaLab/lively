@@ -31,7 +31,7 @@ const createRoute = (page, path) => {
         if (!paramHelper.has(index)) {
           return "";
         }
-        return `${paramHelper.get(index)}=${part}`;
+        return `${paramHelper.get(index)}=${part}&`;
       })
       .join("");
 
