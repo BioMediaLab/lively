@@ -213,6 +213,10 @@ export const Mutation = mutationType({
           mimetype,
         )
         console.log(url)
+        context
+          .knex('users')
+          .where({ id: context.user.id })
+          .update({ photo: url })
         return context
           .knex('users')
           .where({ id: context.user.id })

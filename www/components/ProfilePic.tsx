@@ -20,6 +20,7 @@ const ProfilePic = ({ user }: { user: User }) => {
     mutation UpdateProfilePic($file: FileUpload!) {
       updateProfilePic(pic: $file) {
         id
+        photo
       }
     }
   `);
@@ -31,7 +32,7 @@ const ProfilePic = ({ user }: { user: User }) => {
         width: 100,
         height: 100
       }}
-      src="https://en.meming.world/images/en/thumb/2/2b/Unsettled_Tom.jpg/300px-Unsettled_Tom.jpg"
+      src={user.photo}
     />
   ) : (
     <p
