@@ -11,7 +11,6 @@ import {
 interface User {
   id: string;
   name: string;
-  email: string;
   photo: string;
 }
 
@@ -52,7 +51,6 @@ const ProfilePic = ({ user }: { user: User }) => {
         accept="image/*"
         multiple={false}
         onDrop={files => {
-          console.log(files[0]);
           mutate({ variables: { file: { file: files[0] } } });
         }}
       >

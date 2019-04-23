@@ -6,6 +6,7 @@ import { Quiz } from './Quiz'
 import { User } from './User'
 import { FileUpload } from './inputs'
 import { ClassFile } from './ClassFile'
+import console = require('console')
 
 export const Mutation = mutationType({
   definition(t) {
@@ -241,15 +242,12 @@ export const Mutation = mutationType({
           createReadStream(),
           mimetype,
         )
-        console.log(url)
-        context
+        const newPic = await context
           .knex('users')
           .where({ id: context.user.id })
           .update({ photo: url })
-        return context
-          .knex('users')
-          .where({ id: context.user.id })
-          .first()
+          .returning('*')
+        return newPic[0]
       },
     })
   },

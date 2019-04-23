@@ -17,22 +17,32 @@ const GET_USERS_AST = gql`
   }
 `;
 
+const GET_ME = gql`
+  query GET_USERS {
+    me {
+      id
+      name
+      photo
+    }
+  }
+`;
+
 const Users = () => {
   const { data, error, loading } = useQuery<GET_USERS>(GET_USERS_AST);
+  const me = useQuery<GET_USERS>(GET_ME);
 
-  if (loading) {
+  if (loading || me.loading) {
     return <div>Loading...</div>;
   }
 
-  if (error || !data) {
+  if (error || !data || me.error || !me.data) {
     return <ErrorMessage apolloErr={error} />;
   }
-  console.log(data.users);
 
   return (
     <div>
       <UserList users={data.users} />
-      <ProfilePic user={data.users[data.users.length - 1]} />
+      <ProfilePic user={me.data.me} />
     </div>
   );
 };
