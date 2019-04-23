@@ -1,8 +1,11 @@
-import { mutationType, stringArg, idArg } from 'yoga'
+import { mutationType, stringArg, idArg, arg, booleanArg } from 'yoga'
 import { Session } from './Session'
 import { setCredentialsFromCode, getProfileData } from '../lib/googleAuth'
 import { addSession, deleteSession } from '../lib/sessions'
 import { Quiz } from './Quiz'
+import { User } from './User'
+import { FileUpload } from './inputs'
+import { ClassFile } from './ClassFile'
 
 export const Mutation = mutationType({
   definition(t) {
@@ -32,7 +35,7 @@ export const Mutation = mutationType({
               firstName: data.given_name,
               lastName: data.family_name,
               name: data.name,
-              photo: data.picture,
+              photo_url: data.picture,
             })
             .returning('id')
           uid = newUsers[0]
@@ -59,6 +62,26 @@ export const Mutation = mutationType({
       },
     })
 
+    t.field('updateAdmin', {
+      type: User,
+      args: {
+        user_id: idArg({ nullable: true }),
+        setAdmin: booleanArg(),
+      },
+      resolve: async (_, args, context) => {
+        if (!args.user_id && args.setAdmin) {
+          throw new Error('cannot change a different users admin priveleges')
+        }
+        let uid = args.user_id ? args.user_id : context.user.id
+        const updatedUser = await context
+          .knex('users')
+          .where({ id: uid })
+          .update({ siteAdmin: args.setAdmin })
+          .returning('*')
+        return updatedUser[0]
+      },
+    })
+
     t.field('createQuiz', {
       type: Quiz,
       args: {
@@ -75,6 +98,166 @@ export const Mutation = mutationType({
           .returning('*')
 
         return quiz
+      },
+    })
+
+    t.field('uploadClassFile', {
+      type: ClassFile,
+      args: {
+        file: arg({ type: FileUpload, required: true }),
+        class_id: idArg(),
+        description: stringArg({ required: false }),
+      },
+      resolve: async (_, args, context) => {
+        const { description, class_id } = args
+        const { createReadStream, mimetype, filename } = await args.file.file
+        const name = args.file.name ? args.file.name : filename
+        const { url, key, bucket } = await context.objectStorage.uploadFile(
+          context.objectStorage.getPublicBucket(),
+          createReadStream(),
+          mimetype,
+        )
+        const inserts = await context
+          .knex('class_files')
+          .insert({
+            url,
+            bucket,
+            mimetype,
+            description,
+            class_id,
+            uploader_id: context.user.id,
+            file_name: name,
+            file_key: key,
+          })
+          .returning('*')
+        return inserts[0]
+      },
+    })
+
+    t.field('deleteClassFile', {
+      type: ClassFile,
+      args: {
+        file_id: idArg({ required: true }),
+      },
+      resolve: async (root, args, context) => {
+        const file = await context
+          .knex('class_files')
+          .where({ id: args.file_id })
+          .select('*')
+          .first()
+        if (!file) {
+          throw new Error(`File ${args.file_id} could not be found`)
+        }
+        const status = await context.objectStorage.deleteFile(
+          context.objectStorage.getPublicBucket(),
+          file.file_key,
+        )
+        if (!status) {
+          throw new Error(
+            `Failed to remove file with key ${
+              file.file_key
+            } from object storage.`,
+          )
+        }
+        await context
+          .knex('class_files')
+          .where({ id: args.file_id })
+          .del()
+        return file
+      },
+    })
+
+    t.field('updateClassFile', {
+      type: ClassFile,
+      args: {
+        file_id: idArg(),
+        name: stringArg({ required: false }),
+        description: stringArg({ required: false }),
+      },
+      resolve: async (_, { file_id, ...args }, ctx) => {
+        const updateParams: any = {}
+        if (args.name) {
+          updateParams.file_name = args.name
+        }
+        if (args.description) {
+          updateParams.description = args.description
+        }
+        const updatedFiles = await ctx
+          .knex('class_files')
+          .where({ id: file_id })
+          .update(updateParams)
+          .returning('*')
+        return updatedFiles[0]
+      },
+    })
+
+    t.field('cloneClassFile', {
+      type: ClassFile,
+      args: {
+        old_file: idArg(),
+        new_class_id: idArg({ required: false }),
+      },
+      resolve: async (_, { old_file, new_class_id }, ctx) => {
+        const oldFile = await ctx
+          .knex('class_files')
+          .where({ id: old_file })
+          .first()
+        const class_id = new_class_id ? new_class_id : oldFile.class_id
+
+        const bucket = ctx.objectStorage.getPublicBucket()
+        const newFile = await ctx.objectStorage.cloneFile(
+          oldFile.file_key,
+          bucket,
+          bucket,
+        )
+        const inserts = await ctx
+          .knex('class_files')
+          .insert({
+            url: newFile.url,
+            bucket: newFile.bucket,
+            mimetype: oldFile.mimetype,
+            description: oldFile.description,
+            class_id: class_id,
+            uploader_id: ctx.user.id,
+            file_name: oldFile.file_name,
+            file_key: newFile.key,
+          })
+          .returning('*')
+        return inserts[0]
+      },
+    })
+
+    t.field('updateProfilePic', {
+      type: User,
+      args: {
+        pic: arg({ type: FileUpload, required: true }),
+      },
+      resolve: async (root, args, context) => {
+        const { createReadStream, mimetype, filename } = await args.pic.file
+        const { url, key } = await context.objectStorage.uploadFile(
+          context.objectStorage.getPublicBucket(),
+          createReadStream(),
+          mimetype,
+        )
+
+        context
+          .knex('users')
+          .whereNotNull('photo_key')
+          .andWhere({ id: context.user.id })
+          .first()
+          .then(async row => {
+            await context.objectStorage.deleteFile(
+              context.objectStorage.getPublicBucket(),
+              row.photo_key,
+            )
+          })
+
+        const newPic = await context
+          .knex('users')
+          .where({ id: context.user.id })
+          .update({ photo_key: key, photo_url: url })
+          .returning('*')
+        return newPic[0]
       },
     })
   },

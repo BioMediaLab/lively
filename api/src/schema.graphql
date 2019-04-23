@@ -5,11 +5,26 @@
 """represents one of lively's classes"""
 type Class {
   description: String!
+  files(max: Int): [ClassFile!]!
 
   """Class ID"""
   id: String!
   members(max: Int): [ClassMember!]!
+  myRole: ClassMember!
   name: String!
+}
+
+type ClassFile {
+  class: Class!
+  class_id: String!
+  creator: User!
+  description: String
+  file_key: String!
+  file_name: String!
+  id: ID!
+  mimetype: String!
+  uploader_id: String!
+  url: String!
 }
 
 type ClassMember {
@@ -28,17 +43,36 @@ enum ClassRole {
   STUDENT
 }
 
+input FileUpload {
+  file: Upload
+  name: String
+}
+
 type Mutation {
+  cloneClassFile(new_class_id: ID, old_file: ID): ClassFile!
   createQuiz(class_id: ID, title: String): Quiz!
+  deleteClassFile(file_id: ID!): ClassFile!
   loginGoogle(code: String, sessionInfo: String): Session!
   logout: Session!
+  updateAdmin(setAdmin: Boolean, user_id: ID): User!
+  updateClassFile(description: String, file_id: ID, name: String): ClassFile!
+  updateProfilePic(pic: FileUpload!): User!
+  uploadClassFile(class_id: ID, description: String, file: FileUpload!): ClassFile!
 }
 
 type Query {
   class(class_id: ID): Class!
+  classFile(file_id: ID): ClassFile!
   classQuizzes(class_id: ID): [Quiz!]!
   googleRedirect: String!
-  myClasses: [ClassMember!]!
+  me: User!
+  myClasses(
+    """
+    Return only classes where the user has a given role, such as "Admin"
+    """
+    role: ClassRole
+  ): [ClassMember!]!
+  myClassRole(class_id: ID): ClassMember!
   users: [User!]!
 }
 
@@ -61,8 +95,17 @@ type Session {
   sessionInfo: String
 }
 
+"""The `Upload` scalar type represents a file upload."""
+scalar Upload
+
 type User {
   email: String!
+  firstName: String!
+  hasVisited: Boolean!
   id: ID!
+  lastName: String!
   name: String!
+  photo_key: String
+  photo_url: String
+  siteAdmin: Boolean!
 }

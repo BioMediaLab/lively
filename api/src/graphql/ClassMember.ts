@@ -10,22 +10,22 @@ export const ClassMember = objectType({
     t.field('user', {
       type: User,
       resolve: async (root, args, context) => {
-        const result = await context
-          .knex('class')
+        return context
+          .knex('class_users')
           .join('users', 'class_users.user_id', '=', 'users.id')
           .select('users.*')
-        return result[0]
+          .first()
       },
     })
     t.field('role', { type: ClassRole })
     t.field('class', {
       type: Class,
       resolve: async (root, args, context) => {
-        const result = await context
+        return context
           .knex('class_users')
           .join('classes', 'class_users.class_id', '=', 'classes.id')
           .select('classes.*')
-        return result[0]
+          .first()
       },
     })
   },

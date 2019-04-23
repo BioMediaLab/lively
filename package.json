@@ -15,7 +15,7 @@
     "typecheck": "wsrun typecheck"
   },
   "devDependencies": {
-    "tslint": "5.13.0",
+    "tslint": "5.16.0",
     "wsrun": "3.6.4"
   }
 }

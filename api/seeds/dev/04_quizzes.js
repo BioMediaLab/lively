@@ -3,8 +3,9 @@ exports.seed = function(knex, Promise) {
   return knex('quizzes')
     .del()
     .then(async () => {
-      const classRecord = await knex('classes').first()
-
+      const classRecord = await knex('classes')
+        .select('id')
+        .first()
       return knex('quizzes').insert([
         {
           class_id: classRecord.id,

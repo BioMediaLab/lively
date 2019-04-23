@@ -24,7 +24,8 @@ export default class MyDocument extends Document {
         )
       };
     } finally {
-      sheet.seal();
+      // TODO: figure out what is wrong here
+      (sheet as any).seal();
     }
   }
 }
