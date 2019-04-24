@@ -12,18 +12,23 @@ type Class {
   members(max: Int): [ClassMember!]!
   myRole: ClassMember!
   name: String!
+  unit(unit_id: ID): ClassUnit!
+  units(deployed: Boolean): [ClassUnit!]!
 }
 
 type ClassFile {
   class: Class!
-  class_id: String!
+  class_id: ID!
   creator: User!
   description: String
   file_key: String!
   file_name: String!
   id: ID!
   mimetype: String!
-  uploader_id: String!
+  order: Int!
+  unit: ClassUnit!
+  unit_id: ID!
+  uploader_id: ID!
   url: String!
 }
 
@@ -43,6 +48,19 @@ enum ClassRole {
   STUDENT
 }
 
+type ClassUnit {
+  class: Class!
+  class_id: ID!
+  creator: User!
+  creator_id: ID!
+  deployed: Boolean!
+  description: String
+  files: [ClassFile!]!
+  id: ID!
+  last_modified: String!
+  name: String!
+}
+
 input FileUpload {
   file: Upload
   name: String
@@ -50,14 +68,17 @@ input FileUpload {
 
 type Mutation {
   cloneClassFile(new_class_id: ID, old_file: ID): ClassFile!
+  createClassUnit(auto_deploy: Boolean, class_id: ID, description: String, name: String): ClassUnit!
   createQuiz(class_id: ID, title: String): Quiz!
   deleteClassFile(file_id: ID!): ClassFile!
   loginGoogle(code: String, sessionInfo: String): Session!
   logout: Session!
+  rmClassUnit(unit_id: ID): Boolean!
   updateAdmin(setAdmin: Boolean, user_id: ID): User!
-  updateClassFile(description: String, file_id: ID, name: String): ClassFile!
+  updateClassFile(description: String, file_id: ID, name: String, order: Int): ClassFile!
+  updateClassUnit(add_files: [ID!], deploy: Boolean, description: String, name: String, unit_id: ID): ClassUnit!
   updateProfilePic(pic: FileUpload!): User!
-  uploadClassFile(class_id: ID, description: String, file: FileUpload!): ClassFile!
+  uploadClassFile(class_id: ID, description: String, file: FileUpload!, order: Int, unit_id: ID): ClassFile!
 }
 
 type Query {
@@ -100,7 +121,10 @@ scalar Upload
 
 type User {
   email: String!
+  firstName: String!
+  hasVisited: Boolean!
   id: ID!
+  lastName: String!
   name: String!
   siteAdmin: Boolean!
 }

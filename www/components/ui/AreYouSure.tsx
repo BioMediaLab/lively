@@ -14,6 +14,7 @@ const Outline = styled.div`
   position: fixed;
   top: 0;
   left: 0;
+  z-index: 20;
   background-color: #00000060;
   display: flex;
   align-content: space-around;

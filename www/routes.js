@@ -10,5 +10,9 @@ module.exports.classFiles = createRoute(
   "classFiles",
   "/classes/:class_id/files/:file_id"
 );
-
+module.exports.classUnits = createRoute(
+  "unit",
+  "/classes/:class_id/units/:unit_id"
+);
+module.exports.editUnits = createRoute("editUnits", "/classes/:class_id/edit");
 module.exports.users = createRoute("users", "/users/:id");

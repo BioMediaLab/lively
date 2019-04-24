@@ -2,7 +2,7 @@ import React, { useState, useCallback } from "react";
 import { useMutation } from "react-apollo-hooks";
 import gql from "graphql-tag";
 import styled from "styled-components";
-import AreYouSure from "./AreYouSure";
+import AreYouSure from "./ui/AreYouSure";
 import { DeleteFileMute } from "./__generated__/DeleteFileMute";
 import { testClassFiles } from "../queries/__generated__/testClassFiles";
 import { classFilesFragment } from "../queries/classFiles";
@@ -17,7 +17,7 @@ interface FLIProps {
 }
 
 const FileListItemBody = styled.div`
-  height: 2rem;
+  min-height: 3rem;
   display: flex;
   justify-content: space-between;
   border-bottom: 0.1rem solid #498fff;

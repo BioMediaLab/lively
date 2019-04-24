@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Image, Button } from "rebass";
 import { deleteSessionFrontend } from "../lib/session";
 import Login from "./Login";
-import Drawer from "./Drawer";
+import Drawer from "./ui/Drawer";
 import ClassList from "./ClassList";
 import { useMutation } from "react-apollo-hooks";
 import gql from "graphql-tag";

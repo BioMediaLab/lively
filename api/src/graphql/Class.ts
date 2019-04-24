@@ -1,6 +1,7 @@
-import { objectType, intArg } from 'yoga'
+import { objectType, intArg, idArg, booleanArg } from 'yoga'
 import { ClassMember } from './ClassMember'
 import { ClassFile } from './ClassFile'
+import { ClassUnit } from './ClassUnit'
 
 export const Class = objectType({
   name: 'Class',
@@ -48,6 +49,31 @@ export const Class = objectType({
           .orderBy('file_name')
           .limit(limit)
           .select('*')
+      },
+    })
+    t.list.field('units', {
+      type: ClassUnit,
+      args: {
+        deployed: booleanArg({ nullable: true }),
+      },
+      resolve: async (root, args, ctx) => {
+        if (args.deployed) {
+          return ctx
+            .knex('class_units')
+            .where({ class_id: root.id })
+            .andWhere({ deployed: true })
+        }
+        return ctx.knex('class_units').where({ class_id: root.id })
+      },
+    })
+    t.field('unit', {
+      type: ClassUnit,
+      args: { unit_id: idArg() },
+      resolve: async (root, args, ctx) => {
+        return ctx
+          .knex('class_units')
+          .where({ id: args.unit_id })
+          .first()
       },
     })
   },

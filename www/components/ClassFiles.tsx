@@ -10,39 +10,42 @@ import ClassContentUpload from "./ClassContentUpload";
 import FileListItem from "./FileListItem";
 import styled from "styled-components";
 
-const ListBody = styled.div`
-  width: 80%;
-`;
+const ListBody = styled.div``;
 
 interface Props {
   class_id: string;
+  unit_id: string;
+  showUploader?: boolean;
 }
 
-const ClassFiles: React.FC<Props> = ({ class_id }) => {
+const ClassFiles: React.FC<Props> = ({ class_id, unit_id, showUploader }) => {
   const { data, error, loading } = useQuery<
     ClassFilesQuery,
     ClassFilesQueryVariables
   >(
     gql`
-      query ClassFilesQuery($class_id: ID!) {
+      query ClassFilesQuery($class_id: ID!, $unit_id: ID!) {
         myClassRole(class_id: $class_id) {
           id
           role
           class {
             id
             name
-            files(max: 1000) {
+            unit(unit_id: $unit_id) {
               id
-              mimetype
-              url
-              file_name
-              description
+              files {
+                id
+                mimetype
+                url
+                file_name
+                description
+              }
             }
           }
         }
       }
     `,
-    { variables: { class_id } }
+    { variables: { class_id, unit_id } }
   );
 
   if (error || !data) {
@@ -55,18 +58,19 @@ const ClassFiles: React.FC<Props> = ({ class_id }) => {
   const amAdmin =
     data.myClassRole.role === "ADMIN" || data.myClassRole.role === "PROFESSOR";
 
-  const upload = amAdmin ? (
-    <ClassContentUpload class_id={class_id} />
-  ) : (
-    <span />
-  );
+  const upload =
+    amAdmin && showUploader ? (
+      <ClassContentUpload class_id={class_id} />
+    ) : (
+      <span />
+    );
 
   return (
     <div>
-      <h4>Class Files for {data.myClassRole.class.name}</h4>
+      <div>Class Files for {data.myClassRole.class.name}</div>
       {upload}
       <ListBody>
-        {data.myClassRole.class.files.map(file => (
+        {data.myClassRole.class.unit.files.map(file => (
           <FileListItem
             key={file.id}
             name={file.file_name}
