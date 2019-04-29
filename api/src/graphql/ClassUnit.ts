@@ -12,6 +12,7 @@ export const ClassUnit = objectType({
     t.boolean('deployed')
     t.id('creator_id')
     t.id('class_id')
+    t.int('order', { nullable: true })
     t.string('last_modified', {
       resolve: async (root, args, ctx) => {
         const unitUpdateTime = await ctx
@@ -25,7 +26,7 @@ export const ClassUnit = objectType({
         return `${unitUpdateTime} - ${filesUpdateTime}`
       },
     })
-    t.field('creator', {
+    t.field('modifier', {
       type: User,
       resolve: async ({ creator_id }, _, ctx) => {
         return ctx

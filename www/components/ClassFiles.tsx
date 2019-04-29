@@ -33,8 +33,10 @@ const ClassFiles: React.FC<Props> = ({ class_id, unit_id, showUploader }) => {
             name
             unit(unit_id: $unit_id) {
               id
+              order
               files {
                 id
+                order
                 mimetype
                 url
                 file_name
@@ -60,7 +62,7 @@ const ClassFiles: React.FC<Props> = ({ class_id, unit_id, showUploader }) => {
 
   const upload =
     amAdmin && showUploader ? (
-      <ClassContentUpload class_id={class_id} />
+      <ClassContentUpload class_id={class_id} unit_id={unit_id} />
     ) : (
       <span />
     );

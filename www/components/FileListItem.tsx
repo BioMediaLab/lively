@@ -14,7 +14,14 @@ interface FLIProps {
   id: string;
   classId: string;
   admin?: boolean;
+  showLink?: boolean;
 }
+
+const defaultProps = {
+  admin: false
+};
+
+type DefaultProps = Readonly<typeof defaultProps>;
 
 const FileListItemBody = styled.div`
   min-height: 3rem;
@@ -43,7 +50,7 @@ const ListItemButton = styled.button`
   }
 `;
 
-const FileListItem: React.FC<FLIProps> = props => {
+const FileListItem: React.FC<FLIProps & Partial<DefaultProps>> = props => {
   const [showingConfirm, setShowConf] = useState(false);
   const deleteFile = useMutation<DeleteFileMute>(
     gql`
@@ -95,7 +102,6 @@ const FileListItem: React.FC<FLIProps> = props => {
     [deleteFile]
   );
 
-  const admin = props.admin ? props.admin : false;
   return (
     <>
       <FileListItemBody>
@@ -107,7 +113,7 @@ const FileListItem: React.FC<FLIProps> = props => {
             <ListItemButton onClick={opener}>Download</ListItemButton>
           </FileListAction>
           <FileListAction>
-            {admin ? (
+            {props.admin ? (
               <ListItemButton onClick={() => setShowConf(true)}>
                 Delete
               </ListItemButton>
@@ -127,5 +133,7 @@ const FileListItem: React.FC<FLIProps> = props => {
     </>
   );
 };
+
+FileListItem.defaultProps = defaultProps;
 
 export default FileListItem;

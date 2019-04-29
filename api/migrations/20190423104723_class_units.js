@@ -6,6 +6,7 @@ exports.up = function(knex) {
     t.string('name').notNull()
     t.string('description')
     t.boolean('deployed').defaultTo(true)
+    t.integer('order')
     t.bigInteger('class_id')
       .unsigned()
       .index()

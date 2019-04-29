@@ -18,6 +18,7 @@ const getClassUnits = gql`
       units(deployed: $dep) {
         id
         name
+        order
         description
       }
     }
@@ -148,7 +149,7 @@ const ClassUnitList: React.FC<Props> = props => {
       </ListItemTop>
       {curUnit === id ? (
         <ListBody>
-          <ClassFiles class_id={props.classId} unit_id={id} />
+          <ClassFiles class_id={props.classId} unit_id={id} showUploader />
         </ListBody>
       ) : (
         <React.Fragment />

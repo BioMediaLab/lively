@@ -23,8 +23,14 @@ const CreateUnit: React.FC<Props> = ({ classId }) => {
 
   const create = useMutation(unitCreationMutation);
 
+  const reset = useCallback(() => {
+    setNameField("");
+    setDescField("");
+  }, []);
+
   const doCancel = useCallback(() => {
     setShowing(false);
+    reset();
   }, [setShowing]);
 
   const doSave = useCallback(() => {

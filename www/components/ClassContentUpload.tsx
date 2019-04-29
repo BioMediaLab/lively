@@ -15,8 +15,14 @@ const uploadFile = gql`
     $file: FileUpload!
     $class: ID!
     $desc: String
+    $unit: ID!
   ) {
-    uploadClassFile(file: $file, class_id: $class, description: $desc) {
+    uploadClassFile(
+      file: $file
+      class_id: $class
+      unit_id: $unit
+      description: $desc
+    ) {
       id
       url
       file_name
@@ -70,6 +76,7 @@ const Input = styled.input`
 
 interface Props {
   class_id: string;
+  unit_id: string;
 }
 
 interface State {
@@ -85,7 +92,7 @@ const initialState = {
   uploadBoxTitle: ""
 };
 
-const ClassContextUpload: React.FC<Props> = ({ class_id }) => {
+const ClassContextUpload: React.FC<Props> = ({ class_id, unit_id }) => {
   const mutate = useMutation<
     UploadClassFilesMute,
     UploadClassFilesMuteVariables
@@ -131,6 +138,7 @@ const ClassContextUpload: React.FC<Props> = ({ class_id }) => {
       variables: {
         file: { file: state.curFile, name: state.nameField },
         class: class_id,
+        unit: unit_id,
         desc: state.descField.length > 2 ? state.descField : null
       }
     });

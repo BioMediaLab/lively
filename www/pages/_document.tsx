@@ -1,6 +1,8 @@
 import * as React from "react";
 import Document, { NextDocumentContext } from "next/document";
 import { ServerStyleSheet } from "styled-components";
+// @ts-ignore
+import { resetServerContext } from "react-beautiful-dnd";
 
 export default class MyDocument extends Document {
   static async getInitialProps(ctx: NextDocumentContext) {
@@ -8,6 +10,7 @@ export default class MyDocument extends Document {
     const originalRenderPage = ctx.renderPage;
 
     try {
+      resetServerContext();
       ctx.renderPage = () =>
         originalRenderPage({
           enhanceApp: App => props => sheet.collectStyles(<App {...props} />)

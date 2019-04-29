@@ -17,3 +17,19 @@ export const FileUpload = inputObjectType({
     t.string('name', { required: false })
   },
 })
+
+export const ClassUnitReorder = inputObjectType({
+  name: 'ClassUnitReorder',
+  definition(t) {
+    t.id('class_id')
+    t.int('index')
+  },
+})
+
+export const ClassFileReorder = inputObjectType({
+  name: 'ClassFileReorder',
+  definition(t) {
+    t.id('file_id')
+    t.int('index')
+  },
+})

@@ -22,7 +22,7 @@ export const ClassFile = objectType({
 
     t.id('unit_id')
 
-    t.int('order')
+    t.int('order', { nullable: true })
 
     t.string('description', { nullable: true })
 

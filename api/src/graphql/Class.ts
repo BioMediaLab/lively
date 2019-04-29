@@ -63,7 +63,10 @@ export const Class = objectType({
             .where({ class_id: root.id })
             .andWhere({ deployed: true })
         }
-        return ctx.knex('class_units').where({ class_id: root.id })
+        return ctx
+          .knex('class_units')
+          .where({ class_id: root.id })
+          .orderBy('order')
       },
     })
     t.field('unit', {

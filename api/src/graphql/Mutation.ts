@@ -7,6 +7,9 @@ import { User } from './User'
 import { FileUpload } from './inputs'
 import { ClassFile } from './ClassFile'
 import { ClassUnit } from './ClassUnit'
+import { knex } from '../db'
+import console = require('console')
+import { Value } from 'objection'
 
 export const Mutation = mutationType({
   definition(t) {
@@ -120,6 +123,12 @@ export const Mutation = mutationType({
           createReadStream(),
           mimetype,
         )
+        // here we must determine the proper order if none is given
+        const { max } = await knex('class_files')
+          .where({ unit_id: args.unit_id })
+          .max('order')
+          .first()
+
         const inserts = await context
           .knex('class_files')
           .insert({
@@ -129,7 +138,7 @@ export const Mutation = mutationType({
             description,
             class_id,
             unit_id,
-            order,
+            order: order ? order : max ? max + 1 : 0,
             uploader_id: context.user.id,
             file_name: name,
             file_key: key,
@@ -179,24 +188,70 @@ export const Mutation = mutationType({
         name: stringArg({ required: false }),
         description: stringArg({ required: false }),
         order: intArg({ required: false }),
+        unit_id: idArg({ required: false }),
       },
       resolve: async (_, { file_id, ...args }, ctx) => {
+        const oldFile = await ctx
+          .knex('class_files')
+          .where({ id: file_id })
+          .first()
+
+        if ('unit_id' in args) {
+          if (args.unit_id != oldFile.unit_id) {
+            const { count } = await ctx
+              .knex('class_files')
+              .where({ unit_id: args.unit_id })
+              .count('id')
+              .first()
+            await ctx
+              .knex('class_files')
+              .where({ id: file_id })
+              .update({
+                unit_id: args.unit_id,
+                order: count,
+              })
+            oldFile.order = count
+            oldFile.unit_id = args.unit_id
+          }
+        }
+
+        if ('order' in args) {
+          const delta = oldFile.order > args.order ? 1 : -1
+          const range = [oldFile.order, args.order].sort()
+          await ctx
+            .knex('class_files')
+            .where({ unit_id: oldFile.unit_id })
+            .andWhereBetween('order', range as any)
+            .andWhereNot({ id: file_id })
+            .increment('order', delta)
+
+          await ctx
+            .knex('class_files')
+            .where({ id: file_id })
+            .update({
+              order: args.order,
+            })
+
+          oldFile.order = args.order
+        }
+
         const updateParams: any = {}
         if (args.name) {
           updateParams.file_name = args.name
+          oldFile.file_name = args.name
         }
         if (args.description) {
           updateParams.description = args.description
+          oldFile.description = args.description
         }
-        if (args.order) {
-          updateParams.order = args.order
+        if (Object.keys(updateParams).length > 0) {
+          await ctx
+            .knex('class_files')
+            .where({ id: file_id })
+            .update(updateParams)
         }
-        const updatedFiles = await ctx
-          .knex('class_files')
-          .where({ id: file_id })
-          .update(updateParams)
-          .returning('*')
-        return updatedFiles[0]
+
+        return oldFile
       },
     })
 
@@ -268,6 +323,12 @@ export const Mutation = mutationType({
       },
       resolve: async (_, args, ctx) => {
         const deployed = args.auto_deploy ? args.auto_deploy : false
+        const { max } = await ctx
+          .knex('class_units')
+          .where({ class_id: args.class_id })
+          .max('order')
+          .first()
+        console.log(max)
         const res = await ctx
           .knex('class_units')
           .insert({
@@ -275,6 +336,7 @@ export const Mutation = mutationType({
             description: args.description,
             class_id: args.class_id,
             creator_id: ctx.user.id,
+            order: max ? max + 1 : 0,
             deployed,
           })
           .returning('*')
@@ -290,10 +352,19 @@ export const Mutation = mutationType({
         description: stringArg({ nullable: true }),
         add_files: idArg({ nullable: true, list: true }),
         deploy: booleanArg({ nullable: true }),
+        order: intArg({ nullable: true }),
       },
       resolve: async (_, args, ctx) => {
         let updatedUnit: any = null
-        if (args.name || args.description || args.deploy) {
+
+        console.log(args)
+        let oldOrder
+        if (
+          'name' in args ||
+          'description' in args ||
+          'deploy' in args ||
+          'order' in args
+        ) {
           const updateBody: any = {}
           if (args.name) {
             updateBody.name = args.name
@@ -303,6 +374,15 @@ export const Mutation = mutationType({
           }
           if (args.deploy) {
             updateBody.deployed = args.deploy
+          }
+
+          if ('order' in args) {
+            updateBody.order = args.order
+            oldOrder = (await ctx
+              .knex('class_units')
+              .where({ id: args.unit_id })
+              .select('order')
+              .first()).order
           }
           const res = await ctx
             .knex('class_units')
@@ -322,6 +402,19 @@ export const Mutation = mutationType({
             .knex('class_units')
             .where({ id: args.unit_id })
         }
+
+        // increment the order on all higher
+        if ('order' in args) {
+          const delta = oldOrder > args.order ? 1 : -1
+          const range = [oldOrder, args.order].sort()
+          await ctx
+            .knex('class_units')
+            .where({ class_id: updatedUnit.class_id })
+            .andWhereBetween('order', range as any)
+            .andWhereNot({ id: args.unit_id })
+            .increment('order', delta)
+        }
+
         return updatedUnit
       },
     })
