@@ -137,5 +137,7 @@ type User {
   id: ID!
   lastName: String!
   name: String!
+  photo_key: String
+  photo_url: String
   siteAdmin: Boolean!
 }

@@ -12,25 +12,37 @@ const GET_USERS_AST = gql`
       id
       name
       email
+      photo_url
+    }
+  }
+`;
+
+const GET_ME = gql`
+  query GET_USERS {
+    me {
+      id
+      name
+      photo_url
     }
   }
 `;
 
 const Users = () => {
   const { data, error, loading } = useQuery<GET_USERS>(GET_USERS_AST);
+  const me = useQuery<GET_USERS>(GET_ME);
 
-  if (loading) {
+  if (loading || me.loading) {
     return <div>Loading...</div>;
   }
 
-  if (error || !data) {
+  if (error || !data || me.error || !me.data) {
     return <ErrorMessage apolloErr={error} />;
   }
 
   return (
     <div>
       <UserList users={data.users} />
-      <ProfilePic />
+      <ProfilePic user={me.data.me} />
     </div>
   );
 };
