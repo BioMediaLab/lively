@@ -26,11 +26,12 @@ export interface OnComplete<State, Action> {
 interface InternalAction {
   type: InternalActionType;
   dispAction?: any;
+  allowUndo: boolean;
 }
 
 interface ReturnType<State, Action> {
   state: State;
-  dispatch: (action: Action) => void;
+  dispatch: (action: Action, allowUndo?: boolean) => void;
   undoEnabled: boolean;
   redoEnabled: boolean;
   undo: () => void;
@@ -81,31 +82,42 @@ export function useUndoRedo<State, Action>(
         return oldState;
       }
 
-      const undo: Patch[] = [];
-      const redo: Patch[] = [];
-      const cur = produce(
-        oldState.cur,
-        draftState => reducer(draftState, args.dispAction),
-        (patches, undoPatches) => {
-          undo.push(...undoPatches);
-          redo.push(...patches);
-        }
-      );
-
-      if (globalOnComplete) {
-        globalOnComplete(
-          "dispatch",
-          redo,
+      if (args.allowUndo) {
+        const undo: Patch[] = [];
+        const redo: Patch[] = [];
+        const cur = produce(
           oldState.cur,
-          cur as any,
-          args.dispAction
+          draftState => reducer(draftState, args.dispAction),
+          (patches, undoPatches) => {
+            undo.push(...undoPatches);
+            redo.push(...patches);
+          }
         );
+
+        if (globalOnComplete) {
+          globalOnComplete(
+            "dispatch",
+            redo,
+            oldState.cur,
+            cur as any,
+            args.dispAction
+          );
+        }
+
+        return {
+          cur,
+          future: [],
+          past: [...oldState.past, { undo, redo }]
+        };
       }
 
+      const cur = produce(oldState.cur, (draftState: any) =>
+        reducer(draftState, args.dispAction)
+      );
       return {
         cur,
         future: [],
-        past: [...oldState.past, { undo, redo }]
+        past: []
       };
     },
     []
@@ -122,10 +134,11 @@ export function useUndoRedo<State, Action>(
   const [state, dispatch] = useReducer(internalReducer, internalState);
 
   // external function for use by hook consumer
-  const extDispatch = useCallback((action: Action) => {
+  const extDispatch = useCallback((action: Action, allowUndo) => {
     dispatch({
       type: InternalActionType.DISPATCH,
-      dispAction: action
+      dispAction: action,
+      allowUndo: typeof allowUndo === "boolean" ? allowUndo : true
     });
   }, []);
 
@@ -134,8 +147,8 @@ export function useUndoRedo<State, Action>(
     dispatch: extDispatch,
     undoEnabled: state.past.length > 0,
     redoEnabled: state.future.length > 0,
-    undo: () => dispatch({ type: InternalActionType.UNDO }),
-    redo: () => dispatch({ type: InternalActionType.REDO })
+    undo: () => dispatch({ type: InternalActionType.UNDO, allowUndo: true }),
+    redo: () => dispatch({ type: InternalActionType.REDO, allowUndo: true })
   };
 }
 

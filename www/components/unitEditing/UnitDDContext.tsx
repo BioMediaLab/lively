@@ -10,6 +10,7 @@ import {
   onStateChange
 } from "./apolloManager";
 import { useUndoRedo, useUndoRedoKeys } from "../../lib/undoRedoHook";
+import ControlsButton from "../ui/ControlsButton";
 import UnitTarget from "./UnitTarget";
 import UnitContainer from "./UnitContainer";
 import StatusDisplay from "./StatusDisplay";
@@ -46,9 +47,17 @@ const UnitDDContext: React.FC<Props> = props => {
       apolloDismount();
     };
   }, []);
+  // reset the state when the props change
+  useEffect(() => {
+    console.log("initialUnits", props.initialUnits);
+    dispatch(
+      { type: "reset", args: { newState: { units: props.initialUnits } } },
+      false
+    );
+  }, [props.initialUnits]);
 
   const onDragEnd = useCallback(
-    (res: DropResult, prov) => {
+    (res: DropResult) => {
       if (!res.destination) {
         return;
       }
@@ -76,26 +85,24 @@ const UnitDDContext: React.FC<Props> = props => {
     [state]
   );
 
-  console.log("render", state);
-
   return (
     <DragDropContext onDragEnd={onDragEnd}>
-      <button
+      <ControlsButton
         disabled={!undoEnabled}
         onClick={() => {
           undo();
         }}
       >
         Undo
-      </button>
-      <button
+      </ControlsButton>
+      <ControlsButton
         disabled={!redoEnabled}
         onClick={() => {
           redo();
         }}
       >
         Redo
-      </button>
+      </ControlsButton>
       <StatusDisplay status={curAction} />
       <Droppable droppableId={"units"} type="UNIT" direction="horizontal">
         {provided => (

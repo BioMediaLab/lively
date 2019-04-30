@@ -13,8 +13,8 @@ export enum CurAction {
   None,
   Saving,
   Saved,
-  Undoing,
-  Fail
+  Fail,
+  Creating
 }
 
 export interface State {
@@ -22,7 +22,7 @@ export interface State {
 }
 
 export interface Action {
-  type: "swapfile" | "swapunit" | "action";
+  type: "swapfile" | "swapunit" | "action" | "reset";
   args?: any;
 }
 
@@ -61,6 +61,9 @@ export const reducer = (state: State, action: Action) => {
       units.splice(srcUnitIndex, 1);
       units.splice(destUnitIndex, 0, curUnit);
       return state;
+
+    case "reset":
+      return action.args.newState;
 
     default:
       throw new Error(`Action ${action} is unknown`);

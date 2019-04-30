@@ -4,7 +4,7 @@ Apollo Update Manager Singleton
 import { ApolloClient } from "apollo-boost";
 import gql from "graphql-tag";
 
-import { State, CurAction, getUnitIndex } from "./stateManager";
+import { State, CurAction, getUnitIndex, Action } from "./stateManager";
 import { UpdateUnit, UpdateUnitVariables } from "./__generated__/UpdateUnit";
 import { UpdateFile, UpdateFileVariables } from "./__generated__/UpdateFile";
 import { Patch } from "immer";
@@ -36,6 +36,7 @@ const UpdateFileAST = gql`
 interface Changes {
   patches: Patch[];
   oldState: State;
+  action?: Action;
 }
 
 interface PendingUnitUpdate {
@@ -153,10 +154,12 @@ export const onDismount = () => {
   clearTimeout(timeout as any);
 };
 
-export const onStateChange: OnComplete<State, any> = (
+export const onStateChange: OnComplete<State, Action> = (
   type,
   patches,
-  oldState
+  oldState,
+  _,
+  action
 ) => {
   if (type == "undo" && changes.length > 0) {
     antiChanges.push(changes.pop() as any);
@@ -164,7 +167,7 @@ export const onStateChange: OnComplete<State, any> = (
     changes.push(antiChanges.pop() as any);
   } else {
     console.log("adding changes", patches);
-    changes.push({ patches, oldState });
+    changes.push({ patches, oldState, action });
     antiChanges.splice(0, antiChanges.length);
   }
   if (updateCurAction) {

@@ -6,6 +6,7 @@ import gql from "graphql-tag";
 import ErrorMessage from "../components/ErrorMessage";
 import CreateAUnit from "../components/CreateAUnit";
 import UnitDDContext from "../components/unitEditing/UnitDDContext";
+import { GetUnitsForEditing } from "./__generated__/GetUnitsForEditing";
 
 interface Props {
   classId: string | null;
@@ -15,7 +16,7 @@ const Index: NextFunctionComponent<Props> = props => {
   if (!props.classId) {
     return <ErrorMessage message="Class not found" />;
   }
-  const { data, error, loading } = useQuery(
+  const { data, error, loading } = useQuery<GetUnitsForEditing>(
     gql`
       query GetUnitsForEditing($cls: ID!) {
         class(class_id: $cls) {
@@ -23,6 +24,7 @@ const Index: NextFunctionComponent<Props> = props => {
           units {
             id
             name
+            description
             files {
               id
               file_name
