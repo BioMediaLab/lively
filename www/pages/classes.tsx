@@ -74,6 +74,7 @@ const Classes: NextFunctionComponent<Props> = props => {
         <ClassUnitList
           classId={props.classId}
           showEdit
+          startWithOpenUnit
           onUnitSelect={unitId => {
             classUnits.push(`/classes/${props.classId}/units/${unitId}`);
           }}

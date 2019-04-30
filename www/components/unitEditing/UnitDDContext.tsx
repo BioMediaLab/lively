@@ -1,10 +1,14 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { DragDropContext, DropResult, Droppable } from "react-beautiful-dnd";
 import styled from "styled-components";
 import { useApolloClient } from "react-apollo-hooks";
 
-import { initial, reducer, Unit, Action } from "./stateManager";
-import { onChange as updateApollo } from "./apolloManager";
+import { initial, reducer, Unit, CurAction } from "./stateManager";
+import {
+  onDismount as apolloDismount,
+  setup as apolloSetup,
+  onStateChange
+} from "./apolloManager";
 import { useUndoRedo, useUndoRedoKeys } from "../../lib/undoRedoHook";
 import UnitTarget from "./UnitTarget";
 import UnitContainer from "./UnitContainer";
@@ -22,19 +26,26 @@ const UnitsHolder = styled.div`
 `;
 
 const UnitDDContext: React.FC<Props> = props => {
-  const { state, dispatch, undo, redo, pastStates, redoStates } = useUndoRedo(
+  // tracks whether the state is saved to DB or not
+  const [curAction, setCurAction] = useState<CurAction>(CurAction.None);
+  // tracks the editting state
+  const { state, dispatch, undo, redo, undoEnabled, redoEnabled } = useUndoRedo(
     reducer,
-    initial(props.initialUnits)
+    initial(props.initialUnits),
+    onStateChange
   );
+  // enables ^Z, ^Y for undo, redo
   useUndoRedoKeys(undo, redo);
+  // grabs a copy of ApolloCli to update DB with
   const apolloCli = useApolloClient();
-  const dispatchWithDB = useCallback(
-    (action: Action) => {
-      dispatch(action);
-      updateApollo(action, state, apolloCli, dispatch);
-    },
-    [state]
-  );
+  // when the component unmounts, fire any pending updates immediately
+  // so that the user does not lose any work
+  useEffect(() => {
+    apolloSetup(apolloCli, setCurAction);
+    return () => {
+      apolloDismount();
+    };
+  }, []);
 
   const onDragEnd = useCallback(
     (res: DropResult, prov) => {
@@ -42,7 +53,7 @@ const UnitDDContext: React.FC<Props> = props => {
         return;
       }
       if (res.type === "FILEITEM") {
-        dispatchWithDB({
+        dispatch({
           type: "swapfile",
           args: {
             sourceUnit: res.source.droppableId,
@@ -53,7 +64,7 @@ const UnitDDContext: React.FC<Props> = props => {
         });
       }
       if (res.type === "UNIT") {
-        dispatchWithDB({
+        dispatch({
           type: "swapunit",
           args: {
             srcUnitIndex: res.source.index,
@@ -61,7 +72,6 @@ const UnitDDContext: React.FC<Props> = props => {
           }
         });
       }
-      console.log("drag ended", res, prov);
     },
     [state]
   );
@@ -71,7 +81,7 @@ const UnitDDContext: React.FC<Props> = props => {
   return (
     <DragDropContext onDragEnd={onDragEnd}>
       <button
-        disabled={!(pastStates > 0)}
+        disabled={!undoEnabled}
         onClick={() => {
           undo();
         }}
@@ -79,16 +89,16 @@ const UnitDDContext: React.FC<Props> = props => {
         Undo
       </button>
       <button
-        disabled={!(redoStates > 0)}
+        disabled={!redoEnabled}
         onClick={() => {
           redo();
         }}
       >
         Redo
       </button>
-      <StatusDisplay status={state.curAction} />
+      <StatusDisplay status={curAction} />
       <Droppable droppableId={"units"} type="UNIT" direction="horizontal">
-        {(provided, snap) => (
+        {provided => (
           <UnitsHolder ref={provided.innerRef} {...provided.droppableProps}>
             {state.units.map((unit, ind) => (
               <UnitContainer

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import gql from "graphql-tag";
 import { useQuery } from "react-apollo-hooks";
 import { editUnits } from "../routes";
@@ -91,6 +91,7 @@ interface Props {
   showUndeployed?: boolean;
   showEdit?: boolean;
   onFileSelect?: (fileId: string, unitId: string) => void;
+  startWithOpenUnit?: boolean;
 }
 
 const ClassUnitList: React.FC<Props> = props => {
@@ -104,6 +105,12 @@ const ClassUnitList: React.FC<Props> = props => {
       }
     }
   );
+  useEffect(() => {
+    if (props.startWithOpenUnit && !loading && !error && data) {
+      setUnit(data.class.units[0].id);
+    }
+  }, [loading, error, data]);
+
   if (loading) {
     return <div>Loading</div>;
   }

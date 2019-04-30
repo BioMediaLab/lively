@@ -1,5 +1,3 @@
-import produce from "immer";
-
 export interface File {
   id: string;
   file_name: string;
@@ -21,7 +19,6 @@ export enum CurAction {
 
 export interface State {
   units: Unit[];
-  curAction: CurAction;
 }
 
 export interface Action {
@@ -65,13 +62,6 @@ export const reducer = (state: State, action: Action) => {
       units.splice(destUnitIndex, 0, curUnit);
       return state;
 
-    case "action":
-      const curAction = action.args.curAction as CurAction;
-      return produce(state, tempState => {
-        tempState.curAction = curAction;
-        return tempState;
-      });
-
     default:
       throw new Error(`Action ${action} is unknown`);
   }
@@ -79,7 +69,6 @@ export const reducer = (state: State, action: Action) => {
 
 export const initial = (units: Unit[]): State => {
   return {
-    units,
-    curAction: CurAction.None
+    units
   };
 };

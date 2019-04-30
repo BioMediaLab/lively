@@ -215,7 +215,7 @@ export const Mutation = mutationType({
           }
         }
 
-        if ('order' in args) {
+        if ('order' in args && !args.order == oldFile.order) {
           const delta = oldFile.order > args.order ? 1 : -1
           const range = [oldFile.order, args.order].sort()
           await ctx
