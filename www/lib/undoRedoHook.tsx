@@ -29,9 +29,13 @@ interface InternalAction {
   allowUndo: boolean;
 }
 
+export interface Dispatch<Action> {
+  (action: Action, allowUndo?: boolean): void;
+}
+
 interface ReturnType<State, Action> {
   state: State;
-  dispatch: (action: Action, allowUndo?: boolean) => void;
+  dispatch: Dispatch<Action>;
   undoEnabled: boolean;
   redoEnabled: boolean;
   undo: () => void;

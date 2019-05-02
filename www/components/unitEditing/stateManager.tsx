@@ -1,3 +1,6 @@
+import React from "react";
+import { Dispatch } from "../../lib/undoRedoHook";
+
 export interface File {
   id: string;
   file_name: string;
@@ -22,7 +25,14 @@ export interface State {
 }
 
 export interface Action {
-  type: "swapfile" | "swapunit" | "action" | "reset";
+  type:
+    | "swapfile"
+    | "swapunit"
+    | "action"
+    | "reset"
+    | "unitname"
+    | "filename"
+    | "unitdelete";
   args?: any;
 }
 
@@ -62,6 +72,27 @@ export const reducer = (state: State, action: Action) => {
       units.splice(destUnitIndex, 0, curUnit);
       return state;
 
+    case "unitname": {
+      const { newName, unitId } = action.args;
+      const unit = state.units[getUnitIndex(state.units, unitId)];
+      unit.name = newName;
+      return state;
+    }
+
+    case "unitdelete": {
+      const { unitId } = action.args;
+      state.units.splice(getUnitIndex(state.units, unitId), 1);
+      return state;
+    }
+
+    case "filename": {
+      const { newName, unit, index } = action.args;
+      const unitObj = state.units[getUnitIndex(state.units, unit)];
+      const file = unitObj.files[index];
+      file.file_name = newName;
+      return state;
+    }
+
     case "reset":
       return action.args.newState;
 
@@ -75,3 +106,7 @@ export const initial = (units: Unit[]): State => {
     units
   };
 };
+
+export const UnitEditDispatch = React.createContext<Dispatch<Action> | null>(
+  null
+);

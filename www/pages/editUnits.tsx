@@ -4,7 +4,6 @@ import { useQuery } from "react-apollo-hooks";
 import gql from "graphql-tag";
 
 import ErrorMessage from "../components/ErrorMessage";
-import CreateAUnit from "../components/CreateAUnit";
 import UnitDDContext from "../components/unitEditing/UnitDDContext";
 import { GetUnitsForEditing } from "./__generated__/GetUnitsForEditing";
 
@@ -46,8 +45,7 @@ const Index: NextFunctionComponent<Props> = props => {
 
   return (
     <div>
-      Edit Unit <CreateAUnit classId={props.classId} />
-      <UnitDDContext initialUnits={data.class.units} />
+      <UnitDDContext initialUnits={data.class.units} classId={props.classId} />
     </div>
   );
 };

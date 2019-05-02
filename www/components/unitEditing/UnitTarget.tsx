@@ -25,7 +25,12 @@ const UnitTarget: React.FC<Props> = props => {
             dropping={dropSnap.isDraggingOver}
           >
             {props.files.map((file, index) => (
-              <FileItem key={file.id} file={file} index={index} />
+              <FileItem
+                key={file.id}
+                file={file}
+                index={index}
+                unit={props.id}
+              />
             ))}
             {dropProvided.placeholder}
           </ItemHolder>

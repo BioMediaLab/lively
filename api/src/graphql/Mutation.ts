@@ -434,13 +434,24 @@ export const Mutation = mutationType({
     t.boolean('rmClassUnit', {
       args: { unit_id: idArg() },
       resolve: async (_, { unit_id }, ctx) => {
+        // get info about the unit as we delete it
+        const [{ class_id, order }] = await ctx
+          .knex('class_units')
+          .where({ id: unit_id })
+          .del()
+          .returning(['order', 'class_id'])
+        // change the order of the other class units
+        await ctx
+          .knex('class_units')
+          .where({
+            class_id,
+          })
+          .andWhere('order', '>', order)
+          .decrement('order')
+        // delete all of the unit's files
         await ctx
           .knex('class_files')
           .where({ unit_id })
-          .del()
-        await ctx
-          .knex('class_units')
-          .where({ id: unit_id })
           .del()
         return true
       },

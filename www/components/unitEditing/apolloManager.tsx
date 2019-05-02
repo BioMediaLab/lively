@@ -4,16 +4,62 @@ Apollo Update Manager Singleton
 import { ApolloClient } from "apollo-boost";
 import gql from "graphql-tag";
 
-import { State, CurAction, getUnitIndex, Action } from "./stateManager";
+import { State, CurAction, Action, File, Unit } from "./stateManager";
 import { UpdateUnit, UpdateUnitVariables } from "./__generated__/UpdateUnit";
 import { UpdateFile, UpdateFileVariables } from "./__generated__/UpdateFile";
-import { Patch } from "immer";
 import { OnComplete } from "../../lib/undoRedoHook";
+
+// types
+
+interface PendingUnitUpdate {
+  id: string;
+  order?: number;
+  name?: string;
+  description?: string;
+}
+
+interface PendingFileUpdate {
+  id: string;
+  file_name?: string;
+  order?: number;
+  unit_id?: string;
+  description?: string;
+}
+
+interface PendingFileDelete {
+  id: string;
+}
+
+interface PendingUnitDelete {
+  id: string;
+}
+
+interface Change {
+  file_update?: PendingFileUpdate;
+  unit_update?: PendingUnitUpdate;
+  file_delete?: PendingFileDelete;
+  unit_delete?: PendingUnitDelete;
+  file_create?: boolean;
+  unit_create?: boolean;
+}
+
+interface WhatChanges {
+  file_create: boolean;
+  file_delete: boolean;
+  file_update: boolean;
+  unit_create: boolean;
+  unit_delete: boolean;
+  unit_update: boolean;
+}
+
+type Without<T, K> = Pick<T, Exclude<keyof T, K>>;
+type OrderedFile = File & { order: number; unit_id: string };
+type OrderedUnit = Without<Unit, "files"> & { order: number };
 
 // MUTATIONS
 const UpdateUnitAST = gql`
-  mutation UpdateUnit($unit: ID!, $order: Int) {
-    updateClassUnit(unit_id: $unit, order: $order) {
+  mutation UpdateUnit($unit: ID!, $order: Int, $name: String) {
+    updateClassUnit(unit_id: $unit, order: $order, name: $name) {
       id
       order
       name
@@ -22,8 +68,13 @@ const UpdateUnitAST = gql`
 `;
 
 const UpdateFileAST = gql`
-  mutation UpdateFile($file: ID!, $unit: ID, $order: Int) {
-    updateClassFile(file_id: $file, unit_id: $unit, order: $order) {
+  mutation UpdateFile($file: ID!, $unit: ID, $order: Int, $name: String) {
+    updateClassFile(
+      file_id: $file
+      unit_id: $unit
+      order: $order
+      name: $name
+    ) {
       id
       order
       file_name
@@ -31,26 +82,160 @@ const UpdateFileAST = gql`
   }
 `;
 
-// types
+const DeleteClassUnitAST = gql`
+  mutation DeleteClassUnit($unit: ID!) {
+    rmClassUnit(unit_id: $unit)
+  }
+`;
+const mutateUnit = async (update: PendingUnitUpdate) => {
+  if (!cli) {
+    throw new Error("must run setup function");
+  }
+  return cli.mutate<UpdateUnit, UpdateUnitVariables>({
+    mutation: UpdateUnitAST,
+    variables: { unit: update.id, order: update.order, name: update.name }
+  });
+};
 
-interface Changes {
-  patches: Patch[];
-  oldState: State;
-  action?: Action;
-}
+const mutateFile = async (update: PendingFileUpdate) => {
+  if (!cli) {
+    throw new Error("must run setup function");
+  }
+  return cli.mutate<UpdateFile, UpdateFileVariables>({
+    mutation: UpdateFileAST,
+    variables: {
+      file: update.id,
+      unit: update.unit_id,
+      order: update.order,
+      name: update.file_name
+    }
+  });
+};
 
-interface PendingUnitUpdate {
-  id: string;
-  order?: number;
-  name?: string;
-}
+const deleteUnit = async (update: PendingUnitDelete) => {
+  if (!cli) {
+    throw new Error("mut run setup function");
+  }
+  return cli.mutate({
+    mutation: DeleteClassUnitAST,
+    variables: { unit: update.id }
+  });
+};
 
-interface PendingFileUpdate {
-  id: string;
-  file_name?: string;
-  order?: number;
-  unit_id?: string;
-}
+const statesDeepCompare = (oldState: State, newState: State): Change[] => {
+  const oldFiles: Map<string, OrderedFile> = oldState.units.reduce(
+    (acc, { files, id }) => {
+      files
+        .map((file, index) => ({ order: index, unit_id: id, ...file }))
+        .forEach(file => {
+          acc.set(file.id, file);
+        });
+      return acc;
+    },
+    new Map()
+  );
+
+  const oldUnits: Map<string, OrderedUnit> = oldState.units
+    .map((unit, index) => ({
+      order: index,
+      ...unit
+    }))
+    .reduce((acc, unit) => {
+      acc.set(unit.id, unit);
+      return acc;
+    }, new Map());
+
+  const changes = newState.units.reduce<Change[]>((acc, unit, unitIndex) => {
+    if (oldUnits.has(unit.id)) {
+      const oldUnit = oldUnits.get(unit.id);
+      if (oldUnit && oldUnit.name !== unit.name) {
+        acc.push({
+          unit_update: {
+            id: unit.id,
+            name: unit.name
+          }
+        });
+      }
+      if (oldUnit && oldUnit.order !== unitIndex) {
+        acc.push({
+          unit_update: {
+            id: unit.id,
+            order: unitIndex
+          }
+        });
+      }
+      oldUnits.delete(unit.id);
+    } else {
+      // A new unit has been added
+      acc.push({ unit_create: true });
+    }
+    acc.push(
+      ...unit.files.reduce<Change[]>((acc, file, fileIndex) => {
+        const oldFile = oldFiles.get(file.id);
+        if (oldFile) {
+          const delta: any = {};
+          if (oldFile.file_name !== file.file_name) {
+            delta.file_name = file.file_name;
+          }
+          if (oldFile.order !== fileIndex) {
+            delta.order = fileIndex;
+          }
+          if (oldFile.unit_id !== unit.id) {
+            delta.unit_id = unit.id;
+          }
+          if (Object.keys(delta).length > 0) {
+            delta.id = file.id;
+            acc.push({ file_update: delta });
+          }
+          oldFiles.delete(file.id);
+        } else {
+          // a new file has been added
+          acc.push({ file_create: true });
+        }
+        return acc;
+      }, [])
+    );
+
+    return acc;
+  }, []);
+
+  // handle potential deletions
+  changes.push(
+    ...Array.from(oldFiles.values()).map(file => ({
+      file_delete: { id: file.id }
+    }))
+  );
+  changes.push(
+    ...Array.from(oldUnits.values()).map(({ id }) => ({
+      unit_delete: { id }
+    }))
+  );
+
+  console.log("after reduce", changes);
+
+  return changes;
+};
+
+export const stateChangeSummary = (oldState: State, newState: State) => {
+  const delta = statesDeepCompare(oldState, newState);
+  const what: WhatChanges = {
+    file_create: false,
+    file_delete: false,
+    file_update: false,
+    unit_create: false,
+    unit_delete: false,
+    unit_update: false
+  };
+  return delta.reduce<WhatChanges>((acc, ch) => {
+    if ("file_create" in ch) {
+      acc.file_create = true;
+    }
+    if ("unit_create" in ch) {
+      acc.unit_create = true;
+    }
+    return acc;
+  }, what);
+};
 
 // state
 // set via the setup function
@@ -59,122 +244,72 @@ let updateCurAction: ((action: CurAction) => void) | null = null;
 
 // storing the state of the editor
 let timeout: number | null = null;
-const changes: Changes[] = [];
-const antiChanges: Changes[] = [];
+const changes: {
+  old: State | null;
+  new: State | null;
+} = { old: null, new: null };
 
 // functions
-const mutateUnits = async (updates: Iterable<PendingUnitUpdate>) => {
-  if (!cli) {
-    throw new Error("must run setup function");
-  }
-  for (const update of updates) {
-    await cli.mutate<UpdateUnit, UpdateUnitVariables>({
-      mutation: UpdateUnitAST,
-      variables: { unit: update.id, order: update.order }
-    });
-  }
-};
-
-const mutateFiles = async (updates: Iterable<PendingFileUpdate>) => {
-  if (!cli) {
-    throw new Error("must run setup function");
-  }
-  for (const update of updates) {
-    await cli.mutate<UpdateFile, UpdateFileVariables>({
-      mutation: UpdateFileAST,
-      variables: { file: update.id, unit: update.unit_id, order: update.order }
-    });
-  }
-};
 
 const reduce = async () => {
-  const pendingUnits = new Map<string, PendingUnitUpdate>();
-  const pendingFiles = new Map<string, PendingFileUpdate>();
-
-  console.log("APOLLO REDUCE", changes);
-
-  changes.forEach(({ patches, oldState }) => {
-    console.log(patches, oldState);
-    if (patches.length === 0) {
-      return;
-    }
-    const topPatch = patches[0];
-    // An existing unit has been changed
-    if (topPatch.op === "replace" && topPatch.value.__typename == "ClassUnit") {
-      const updatedUnit: PendingUnitUpdate = { id: topPatch.value.id };
-      const oldUnit =
-        oldState.units[getUnitIndex(oldState.units, updatedUnit.id)];
-      if (oldUnit.name !== topPatch.value.name) {
-        updatedUnit.name = topPatch.value.name;
-      }
-      if (topPatch.path[1] !== getUnitIndex(oldState.units, updatedUnit.id)) {
-        updatedUnit.order = topPatch.path[1] as any;
-      }
-      if ("order" in updatedUnit || "name" in updatedUnit) {
-        pendingUnits.set(updatedUnit.id, updatedUnit);
-      }
-    }
-
-    patches.forEach(patch => {
-      if (patch.value && patch.value.__typename == "ClassFile") {
-        const upFile: PendingFileUpdate = { id: patch.value.id };
-        if (patch.op === "add") {
-          const unit = oldState.units[patch.path[1] as any];
-          upFile.unit_id = unit.id;
-        }
-        upFile.order = patch.path[3] as any;
-        pendingFiles.set(upFile.id, upFile);
-      }
-    });
-  });
-
-  // clear out the changes
-  changes.splice(0, changes.length);
   try {
-    await mutateUnits(pendingUnits.values());
-    await mutateFiles(pendingFiles.values());
-    if (updateCurAction) {
-      updateCurAction(CurAction.Saved);
+    if (changes.old && changes.new) {
+      const updates = statesDeepCompare(changes.old, changes.new);
+
+      for (const upd of updates) {
+        if (upd.file_update) {
+          await mutateFile(upd.file_update);
+        }
+        if (upd.unit_update) {
+          await mutateUnit(upd.unit_update);
+        }
+        if (upd.unit_delete) {
+          await deleteUnit(upd.unit_delete);
+        }
+      }
+      changes.old = changes.new;
+
+      if (updateCurAction) {
+        updateCurAction(CurAction.Saved);
+      }
     }
   } catch (err) {
+    console.warn(err);
     if (updateCurAction) {
       updateCurAction(CurAction.Fail);
     }
   }
-  timeout = null;
 };
 
-export const setup = (c: ApolloClient<any>, u: (action: CurAction) => void) => {
+export const setup = (
+  iState: State,
+  c: ApolloClient<any>,
+  u: (action: CurAction) => void
+) => {
+  changes.old = iState;
+  changes.new = iState;
   cli = c;
   updateCurAction = u;
 };
 
 export const onDismount = () => {
-  reduce();
   clearTimeout(timeout as any);
+  updateCurAction = null;
+  reduce();
 };
 
 export const onStateChange: OnComplete<State, Action> = (
-  type,
-  patches,
-  oldState,
-  _,
-  action
+  _type,
+  _patches,
+  _oldState,
+  newState
 ) => {
-  if (type == "undo" && changes.length > 0) {
-    antiChanges.push(changes.pop() as any);
-  } else if (type == "redo" && antiChanges.length > 0) {
-    changes.push(antiChanges.pop() as any);
-  } else {
-    console.log("adding changes", patches);
-    changes.push({ patches, oldState, action });
-    antiChanges.splice(0, antiChanges.length);
-  }
+  changes.new = newState;
   if (updateCurAction) {
     updateCurAction(CurAction.Saving);
   }
 
-  if (typeof timeout !== "number") {
-    timeout = setTimeout(reduce, 2000);
-  }
+  // it's fine to clear a null timeout
+  clearTimeout(timeout as any);
+  setTimeout(reduce, 1000);
 };
