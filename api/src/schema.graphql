@@ -13,6 +13,7 @@ type Class {
   myRole: ClassMember!
   name: String!
   unit(unit_id: ID): ClassUnit!
+  unitByOrder(order: Int): ClassUnit
   units(deployed: Boolean): [ClassUnit!]!
 }
 

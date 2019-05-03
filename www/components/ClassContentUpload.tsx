@@ -2,13 +2,15 @@ import React, { useCallback, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import gql from "graphql-tag";
 import { useMutation } from "react-apollo-hooks";
+import styled from "styled-components";
+
 import {
   UploadClassFilesMute,
   UploadClassFilesMuteVariables
 } from "./__generated__/UploadClassFilesMute";
-import styled from "styled-components";
-import { testClassFiles } from "../queries/__generated__/testClassFiles";
-import { classFilesFragment } from "../queries/classFiles";
+import Input from "./ui/SmallInput";
+import ControlsButton from "./ui/ControlsButton";
+import { SingleUnitFiles } from "./__generated__/SingleUnitFiles";
 
 const uploadFile = gql`
   mutation UploadClassFilesMute(
@@ -28,6 +30,17 @@ const uploadFile = gql`
       file_name
       mimetype
       description
+      order
+    }
+  }
+`;
+
+const PatchFragment = gql`
+  fragment SingleUnitFiles on ClassUnit {
+    id
+    files {
+      id
+      file_name
     }
   }
 `;
@@ -63,20 +76,12 @@ const Fields = styled.div`
   padding-bottom: 3rem;
 `;
 
-const Input = styled.input`
-  border: none;
-  border-bottom: 0.1rem solid #049b00;
-  padding: 0.5rem;
-  transition: background-color 0.5s ease;
-
-  :focus {
-    background-color: gainsboro;
-  }
-`;
-
 interface Props {
   class_id: string;
   unit_id: string;
+  onCancel?: () => void;
+  onSubmit?: (name: string, desc: string) => void;
+  onResult?: (error: boolean, data?: UploadClassFilesMute) => void;
 }
 
 interface State {
@@ -92,23 +97,27 @@ const initialState = {
   uploadBoxTitle: ""
 };
 
-const ClassContextUpload: React.FC<Props> = ({ class_id, unit_id }) => {
+const ClassContextUpload: React.FC<Props> = ({
+  class_id,
+  unit_id,
+  ...props
+}) => {
   const mutate = useMutation<
     UploadClassFilesMute,
     UploadClassFilesMuteVariables
   >(uploadFile, {
     update: (proxy, result) => {
-      const oldData = proxy.readFragment<testClassFiles>({
-        id: `Class:${class_id}`,
-        fragment: classFilesFragment
+      const oldData = proxy.readFragment<SingleUnitFiles>({
+        id: `ClassUnit:${unit_id}`,
+        fragment: PatchFragment
       });
 
       if (oldData && result.data) {
         oldData.files.push(result.data.uploadClassFile);
 
         proxy.writeFragment({
-          id: `Class:${class_id}`,
-          fragment: classFilesFragment,
+          id: `ClassUnit:${unit_id}`,
+          fragment: PatchFragment,
           data: oldData
         });
       }
@@ -134,6 +143,9 @@ const ClassContextUpload: React.FC<Props> = ({ class_id, unit_id }) => {
   );
 
   const onSubmit = useCallback(() => {
+    if (props.onSubmit) {
+      props.onSubmit(state.nameField, state.descField);
+    }
     mutate({
       variables: {
         file: { file: state.curFile, name: state.nameField },
@@ -141,9 +153,24 @@ const ClassContextUpload: React.FC<Props> = ({ class_id, unit_id }) => {
         unit: unit_id,
         desc: state.descField.length > 2 ? state.descField : null
       }
+    }).then(res => {
+      if (props.onResult) {
+        if (res.errors || !res.data) {
+          props.onResult(true);
+        } else {
+          props.onResult(false, res.data);
+        }
+      }
     });
     updateState(initialState);
   }, [mutate, updateState, state.curFile, state.nameField]);
+
+  const onCancel = useCallback(() => {
+    updateState(initialState);
+    if (props.onCancel) {
+      props.onCancel();
+    }
+  }, []);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
@@ -181,12 +208,13 @@ const ClassContextUpload: React.FC<Props> = ({ class_id, unit_id }) => {
           }}
           value={state.descField}
         />
-        <button
+        <ControlsButton
           disabled={!(state.curFile && state.nameField.length > 1)}
           onClick={onSubmit}
         >
           Upload
-        </button>
+        </ControlsButton>
+        <ControlsButton onClick={onCancel}>Cancel</ControlsButton>
       </Fields>
       <Upload {...getRootProps()}>
         <input {...getInputProps()} />

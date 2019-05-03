@@ -156,7 +156,7 @@ const ClassUnitList: React.FC<Props> = props => {
       </ListItemTop>
       {curUnit === id ? (
         <ListBody>
-          <ClassFiles class_id={props.classId} unit_id={id} showUploader />
+          <ClassFiles class_id={props.classId} unit_id={id} />
         </ListBody>
       ) : (
         <React.Fragment />

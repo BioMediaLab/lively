@@ -1,14 +1,19 @@
 import React, { useCallback, useContext, useState } from "react";
 import { Draggable } from "react-beautiful-dnd";
 import styled from "styled-components";
+import { Box } from "rebass";
 
+import { classUnits } from "../../routes";
 import ControlsButton from "../ui/ControlsButton";
 import EditableTextItem from "../ui/EditableTextItem";
 import { UnitEditDispatch } from "./stateManager";
 import AreYouSure from "../ui/AreYouSure";
+import BigDialog from "../ui/BigDialog";
+import ClassContentUpload from "../ClassContentUpload";
 
 interface Props {
   id: string;
+  classId: string;
   index: number;
   name: string;
 }
@@ -32,7 +37,7 @@ const Top = styled.div<{ isDragging: boolean }>`
 
 const Controls = styled.div`
   display: flex;
-  padding: 1rem;
+  padding-bottom: 1rem;
 `;
 
 const UnitContainer: React.FC<Props> = props => {
@@ -66,9 +71,20 @@ const UnitContainer: React.FC<Props> = props => {
     },
     [dispatch, props.id]
   );
+  const [showingFileAdd, setShowAdd] = useState(false);
 
   return (
     <>
+      <BigDialog showing={showingFileAdd}>
+        <ClassContentUpload
+          class_id={props.classId}
+          unit_id={props.id}
+          onCancel={() => {
+            setShowAdd(false);
+          }}
+          onSubmit={() => setShowAdd(false)}
+        />
+      </BigDialog>
       <AreYouSure showing={showingDeleteConf} onSelect={handleDel} />
       <Draggable draggableId={`${props.id}-unit`} index={props.index}>
         {(prov, snap) => (
@@ -83,10 +99,27 @@ const UnitContainer: React.FC<Props> = props => {
                 onUpdate={updateUnitsName}
               />
               <Controls>
-                <ControlsButton>Add File</ControlsButton>
-                <ControlsButton onClick={() => setShowDel(true)}>
-                  Delete
-                </ControlsButton>
+                <Box px={3}>
+                  <ControlsButton onClick={() => setShowAdd(true)}>
+                    Add File
+                  </ControlsButton>
+                </Box>
+                <Box px={3}>
+                  <ControlsButton onClick={() => setShowDel(true)}>
+                    Delete
+                  </ControlsButton>
+                </Box>
+                <Box px={3}>
+                  <ControlsButton
+                    onClick={() =>
+                      classUnits.push(
+                        `/classes/${props.classId}/units/${props.id}`
+                      )
+                    }
+                  >
+                    View
+                  </ControlsButton>
+                </Box>
               </Controls>
             </Top>
             {props.children}

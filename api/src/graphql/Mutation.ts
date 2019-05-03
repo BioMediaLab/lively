@@ -1,4 +1,5 @@
 import { mutationType, stringArg, idArg, arg, booleanArg, intArg } from 'yoga'
+
 import { Session } from './Session'
 import { setCredentialsFromCode, getProfileData } from '../lib/googleAuth'
 import { addSession, deleteSession } from '../lib/sessions'
@@ -8,8 +9,6 @@ import { FileUpload } from './inputs'
 import { ClassFile } from './ClassFile'
 import { ClassUnit } from './ClassUnit'
 import { knex } from '../db'
-import console = require('console')
-import { Value } from 'objection'
 
 export const Mutation = mutationType({
   definition(t) {
@@ -297,7 +296,7 @@ export const Mutation = mutationType({
         pic: arg({ type: FileUpload, required: true }),
       },
       resolve: async (root, args, context) => {
-        const { createReadStream, mimetype, filename } = await args.pic.file
+        const { createReadStream, mimetype } = await args.pic.file
         const { url, key } = await context.objectStorage.uploadFile(
           context.objectStorage.getPublicBucket(),
           createReadStream(),

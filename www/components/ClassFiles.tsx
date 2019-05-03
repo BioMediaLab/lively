@@ -34,6 +34,7 @@ const ClassFiles: React.FC<Props> = ({ class_id, unit_id, showUploader }) => {
             unit(unit_id: $unit_id) {
               id
               order
+              name
               files {
                 id
                 order
@@ -69,7 +70,7 @@ const ClassFiles: React.FC<Props> = ({ class_id, unit_id, showUploader }) => {
 
   return (
     <div>
-      <div>Class Files for {data.myClassRole.class.name}</div>
+      <div>Class Files for {data.myClassRole.class.unit.name}</div>
       {upload}
       <ListBody>
         {data.myClassRole.class.unit.files.map(file => (

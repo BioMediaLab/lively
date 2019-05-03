@@ -87,6 +87,7 @@ const DeleteClassUnitAST = gql`
     rmClassUnit(unit_id: $unit)
   }
 `;
+
 const mutateUnit = async (update: PendingUnitUpdate) => {
   if (!cli) {
     throw new Error("must run setup function");
@@ -210,8 +211,6 @@ const statesDeepCompare = (oldState: State, newState: State): Change[] => {
       unit_delete: { id }
     }))
   );
-
-  console.log("after reduce", changes);
 
   return changes;
 };

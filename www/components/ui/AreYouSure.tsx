@@ -74,7 +74,7 @@ const AreYouSure: React.FC<Props> = props => {
         <h1>{title}</h1>
         <div>{bText}</div>
         <ButtonBox>
-          <ButtonItem yes onClick={() => props.onSelect(true)}>
+          <ButtonItem yes autoFocus onClick={() => props.onSelect(true)}>
             Yes
           </ButtonItem>
           <ButtonItem onClick={() => props.onSelect(false)}>No</ButtonItem>

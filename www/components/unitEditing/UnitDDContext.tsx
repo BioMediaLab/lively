@@ -120,8 +120,6 @@ const UnitDDContext: React.FC<Props> = props => {
     [state]
   );
 
-  console.log("RENDER", state);
-
   return (
     <DragDropContext onDragEnd={onDragEnd}>
       <TopBar>
@@ -159,6 +157,7 @@ const UnitDDContext: React.FC<Props> = props => {
                 <UnitContainer
                   id={unit.id}
                   key={unit.id}
+                  classId={props.classId}
                   index={ind}
                   name={unit.name}
                 >

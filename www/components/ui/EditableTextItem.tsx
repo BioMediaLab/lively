@@ -2,11 +2,14 @@ import React, { useState, useEffect, useCallback } from "react";
 import styled from "styled-components";
 import { IoIosThumbsDown, IoIosThumbsUp } from "react-icons/io";
 import { MdEdit } from "react-icons/md";
+
 import IconButton from "./IconButton";
+import Input from "./SmallInput";
 
 const EditBody = styled.div`
   display: flex;
   align-items: center;
+  height: 2.5rem;
 `;
 
 const Controls = styled.div<{ editing: boolean }>`
@@ -37,6 +40,9 @@ const EditableTextItem: React.FC<Props> = props => {
   }, []);
   const saveEdit = useCallback(() => {
     setEditing(false);
+    if (field === props.bodyText) {
+      return;
+    }
     if (props.onUpdate) {
       props.onUpdate(field);
     }
@@ -59,11 +65,20 @@ const EditableTextItem: React.FC<Props> = props => {
             <IoIosThumbsDown />
           </IconButton>
         </Controls>
-        <input
+        <Input
+          autoFocus
           value={field}
           onChange={e => {
             const newText = e.target.value;
             setField(newText);
+          }}
+          onKeyDown={ev => {
+            if (ev.keyCode === 13) {
+              saveEdit();
+            }
+            if (ev.keyCode === 27) {
+              cancelEdit();
+            }
           }}
         />
       </EditBody>

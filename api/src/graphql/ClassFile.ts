@@ -52,8 +52,12 @@ export const ClassFile = objectType({
 
     t.field('unit', {
       type: ClassUnit,
-      resolve: async ({ unit_id }, _, ctx) =>
-        ctx.knex('class_units').where({ id: unit_id }),
+      resolve: async (root, _, ctx) => {
+        return ctx
+          .knex('class_units')
+          .where({ id: root.unit_id })
+          .first()
+      },
     })
   },
 })

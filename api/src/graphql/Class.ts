@@ -79,5 +79,17 @@ export const Class = objectType({
           .first()
       },
     })
+    t.field('unitByOrder', {
+      type: ClassUnit,
+      nullable: true,
+      args: { order: intArg() },
+      resolve: async ({ id }, { order }, ctx) => {
+        return ctx
+          .knex('class_units')
+          .where({ class_id: id })
+          .andWhere({ order })
+          .first()
+      },
+    })
   },
 })

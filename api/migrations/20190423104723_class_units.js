@@ -7,6 +7,8 @@ exports.up = function(knex) {
     t.string('description')
     t.boolean('deployed').defaultTo(true)
     t.integer('order')
+    t.string('photo')
+    t.string('photo_key')
     t.bigInteger('class_id')
       .unsigned()
       .index()
