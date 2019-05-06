@@ -3,9 +3,10 @@ exports.seed = function(knex, Promise) {
   return knex('class_users')
     .del()
     .then(async () => {
-      const classes = await knex('classes')
+      const { id: classId } = await knex('classes')
         .where({ name: 'Lively 101' })
         .select('id')
+        .first()
       const nick = await knex('users')
         .where({ email: 'nicholas.dieffenbacherkrall@maine.edu' })
         .select('id')
@@ -15,21 +16,20 @@ exports.seed = function(knex, Promise) {
       const enoch = await knex('users')
         .where({ email: 'wei.lin@maine.edu' })
         .select('id')
-      const classId = classes[0].id
       // Inserts seed entries
       return knex('class_users').insert([
         {
-          user_id: nick[0],
+          user_id: nick[0].id,
           class_id: classId,
           role: 'ADMIN',
         },
         {
-          user_id: andy[0],
+          user_id: andy[0].id,
           class_id: classId,
           role: 'ADMIN',
         },
         {
-          user_id: enoch[0],
+          user_id: enoch[0].id,
           class_id: classId,
           role: 'ADMIN',
         },

@@ -7,6 +7,8 @@ import { deleteSessionFrontend } from "../lib/session";
 import Login from "./Login";
 import Drawer from "./Drawer";
 import ClassList from "./ClassList";
+import { useMutation } from "react-apollo-hooks";
+import gql from "graphql-tag";
 
 const RootWrapper = styled.div`
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
@@ -26,6 +28,7 @@ const HeaderStyles = styled.header`
   left: 0;
   width: 100%;
   align-items: center;
+  z-index: 10;
 `;
 
 const Logo = styled.div`
@@ -38,6 +41,14 @@ interface Props {
 }
 
 const Layout: React.FunctionComponent<Props> = props => {
+  const logout = useMutation(gql`
+    mutation LogOutMute {
+      logout {
+        id
+      }
+    }
+  `);
+
   let child;
   if (props.hasSession) {
     child = (
@@ -57,8 +68,10 @@ const Layout: React.FunctionComponent<Props> = props => {
           </Logo>
           <Button
             onClick={() => {
-              deleteSessionFrontend();
-              window.location.reload(true);
+              logout().finally(() => {
+                deleteSessionFrontend();
+                window.location.reload(true);
+              });
             }}
           >
             Logout

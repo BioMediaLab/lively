@@ -46,7 +46,6 @@ class Login extends react.Component<WithApolloClient<Props>> {
           variables: { code: this.props.googleCode }
         })
         .then(res => {
-          console.log(res);
           if (res.errors || !res.data) {
             throw new Error("login failed");
           }

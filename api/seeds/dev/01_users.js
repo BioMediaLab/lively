@@ -31,7 +31,7 @@ exports.seed = function(knex, Promise) {
           firstName: 'Jeremiah',
           lastName: 'User',
           email: 'ju@maine.edu',
-          photo:
+          photo_url:
             'https://en.meming.world/images/en/thumb/2/2b/Unsettled_Tom.jpg/300px-Unsettled_Tom.jpg',
         },
       ])

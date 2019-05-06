@@ -22,6 +22,9 @@ services:
     restart: always
     ports:
       - "127.0.0.1:9000:9000"
+    environment:
+      MINIO_ACCESS_KEY: LIVELYMINIO
+      MINIO_SECRET_KEY: livelyMinioTemporarySecretKey
     volumes:
       - lively_storage:/data
     command: "server /data"

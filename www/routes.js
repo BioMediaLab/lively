@@ -6,4 +6,9 @@ module.exports.classSettings = createRoute(
   "classSettings",
   "/classes/:course_id/settings"
 );
+module.exports.classFiles = createRoute(
+  "classFiles",
+  "/classes/:class_id/files/:file_id"
+);
+
 module.exports.users = createRoute("users", "/users/:id");
