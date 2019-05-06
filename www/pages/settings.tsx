@@ -4,7 +4,7 @@ import gql from "graphql-tag";
 import Link from "next/link";
 
 import makePage from "../lib/makePage";
-import AreYouSure from "../components/AreYouSure";
+import AreYouSure from "../components/ui/AreYouSure";
 
 const Settings = () => {
   const [showConf, setShowConf] = useState(false);

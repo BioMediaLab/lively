@@ -12,6 +12,7 @@ export const ClassMember = objectType({
       resolve: async (root, args, context) => {
         return context
           .knex('class_users')
+          .where({ 'class_users.id': root.id })
           .join('users', 'class_users.user_id', '=', 'users.id')
           .select('users.*')
           .first()
@@ -23,6 +24,7 @@ export const ClassMember = objectType({
       resolve: async (root, args, context) => {
         return context
           .knex('class_users')
+          .where({ 'class_users.user_id': root.id })
           .join('classes', 'class_users.class_id', '=', 'classes.id')
           .select('classes.*')
           .first()

@@ -3,21 +3,19 @@ import { NextFC } from "next";
 import gql from "graphql-tag";
 import { useQuery, useMutation } from "react-apollo-hooks";
 import styled from "styled-components";
+import { MdEdit } from "react-icons/md";
 
 import makePage from "../lib/makePage";
-import { classesRoute } from "../routes";
+import { classesRoute, classUnits } from "../routes";
 import ErrorMessage from "../components/ErrorMessage";
 import FileViewer from "../components/FileViewer";
+import SmallInput from "../components/ui/SmallInput";
 import { ClassFileQ, ClassFileQVariables } from "./__generated__/ClassFileQ";
 import {
   UpdateFileFromPage,
   UpdateFileFromPageVariables
 } from "./__generated__/UpdateFileFromPage";
-
-const DescP = styled.p`
-  margin-left: 2rem;
-  font-size: 90%;
-`;
+import IconButton from "../components/ui/IconButton";
 
 const EditingTopBody = styled.div`
   display: flex;
@@ -49,6 +47,10 @@ const ClassFiles: NextFC<Props> = props => {
           file_name
           description
           url
+          unit {
+            id
+            name
+          }
           class {
             id
             name
@@ -114,10 +116,11 @@ const ClassFiles: NextFC<Props> = props => {
     topSection = (
       <EditingTopBody>
         <label htmlFor="File Name">File Name</label>
-        <input
+        <SmallInput
           name="File Name"
           value={state.nameField}
           minLength={1}
+          autoFocus
           onChange={e => {
             const nameField = e.target.value;
             setState(state => ({ ...state, nameField }));
@@ -162,26 +165,38 @@ const ClassFiles: NextFC<Props> = props => {
     topSection = (
       <div>
         <div>
-          <div>
-            <classesRoute.Link path={`/classes/${props.classId}`}>
+          <nav>
+            <ol style={{ paddingLeft: "1rem", listStyleType: "none" }}>
+              <classesRoute.Link path={`/classes/${props.classId}`}>
+                {data.classFile.class.name}
+              </classesRoute.Link>
+              {" > "}
+              <classUnits.Link
+                path={`/classes/${props.classId}/units/${
+                  data.classFile.unit.id
+                }`}
+              >
+                {data.classFile.unit.name}
+              </classUnits.Link>
+              {" > "}
               {state.nameField}
-            </classesRoute.Link>
-            {" > "}
-            {data.classFile.file_name}
-          </div>
-          <DescP>{data.classFile.description}</DescP>
+            </ol>
+          </nav>
+          {myRole === "ADMIN" || myRole === "PROFESSOR" ? (
+            <div>
+              <IconButton
+                onClick={() =>
+                  setState(state => ({ ...state, isEditing: true }))
+                }
+              >
+                <MdEdit />
+              </IconButton>
+            </div>
+          ) : (
+            <span />
+          )}
         </div>
-        {myRole === "ADMIN" || myRole === "PROFESSOR" ? (
-          <div>
-            <button
-              onClick={() => setState(state => ({ ...state, isEditing: true }))}
-            >
-              Edit
-            </button>
-          </div>
-        ) : (
-          <span />
-        )}
+        <small>{data.classFile.description}</small>
       </div>
     );
   }

@@ -1,13 +1,14 @@
 import React from "react";
 import { NextFunctionComponent } from "next";
-import gql from "graphql-tag";
 import makePage from "../lib/makePage";
 import { useQuery } from "react-apollo-hooks";
-import { Heading } from "rebass";
+
+import { classSettings, classUnits } from "../routes";
+import gql from "graphql-tag";
 import ErrorMessage from "../components/ErrorMessage";
 import { GET_CLASS, GET_CLASSVariables } from "./__generated__/GET_CLASS";
-import { classSettings } from "../routes";
-import ClassFiles from "../components/ClassFiles";
+import styled from "styled-components";
+import ClassUnitList from "../components/ClassUnitList";
 
 const GET_CLASS_QUERY = gql`
   query GET_CLASS($classId: ID!) {
@@ -19,6 +20,24 @@ const GET_CLASS_QUERY = gql`
   }
 `;
 
+const ClassMain = styled.div`
+  display: flex;
+`;
+
+const ClassLeft = styled.div`
+  background-color: ${p => p.theme.colors.background.secondary};
+  width: 34%;
+  min-height: 90vh;
+  margin-left: -2rem;
+  margin-top: -2rem;
+  padding-left: 4rem;
+  padding-top: 3rem;
+`;
+
+const ClassRight = styled.div`
+  margin-left: 2rem;
+`;
+
 interface Props {
   classId: string | false;
 }
@@ -27,6 +46,7 @@ const Classes: NextFunctionComponent<Props> = props => {
   if (!props.classId) {
     return <div>Class Not Found</div>;
   }
+
   const { data, error, loading } = useQuery<GET_CLASS, GET_CLASSVariables>(
     GET_CLASS_QUERY,
     {
@@ -42,14 +62,25 @@ const Classes: NextFunctionComponent<Props> = props => {
 
   const curClass = data.class;
   return (
-    <div>
-      <Heading>{curClass.name}</Heading>
-      <p>{curClass.description}</p>
-      <classSettings.Link path={`/classes/${props.classId}/settings`}>
-        <a>Settings</a>
-      </classSettings.Link>
-      <ClassFiles class_id={props.classId} />
-    </div>
+    <ClassMain>
+      <ClassLeft>
+        <h2>{curClass.name}</h2>
+        <p>{curClass.description}</p>
+        <classSettings.Link path={`/classes/${props.classId}/settings`}>
+          <a>Settings</a>
+        </classSettings.Link>
+      </ClassLeft>
+      <ClassRight>
+        <ClassUnitList
+          classId={props.classId}
+          showEdit
+          startWithOpenUnit
+          onUnitSelect={unitId => {
+            classUnits.push(`/classes/${props.classId}/units/${unitId}`);
+          }}
+        />
+      </ClassRight>
+    </ClassMain>
   );
 };
 

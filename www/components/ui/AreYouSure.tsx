@@ -14,6 +14,7 @@ const Outline = styled.div`
   position: fixed;
   top: 0;
   left: 0;
+  z-index: 20;
   background-color: #00000060;
   display: flex;
   align-content: space-around;
@@ -73,7 +74,7 @@ const AreYouSure: React.FC<Props> = props => {
         <h1>{title}</h1>
         <div>{bText}</div>
         <ButtonBox>
-          <ButtonItem yes onClick={() => props.onSelect(true)}>
+          <ButtonItem yes autoFocus onClick={() => props.onSelect(true)}>
             Yes
           </ButtonItem>
           <ButtonItem onClick={() => props.onSelect(false)}>No</ButtonItem>
