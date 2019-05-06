@@ -11,7 +11,7 @@ import {
 interface User {
   id: string;
   name: string;
-  photo_url: string;
+  photo_url: string | null;
 }
 
 const ProfilePic = ({ user }: { user: User }) => {

@@ -1,6 +1,9 @@
 import React from "react";
 import { useState, FunctionComponent } from "react";
 import styled from "styled-components";
+import { MdList } from "react-icons/md";
+
+import IconButton from "./IconButton";
 
 const Behind = styled.div<{ open: boolean }>`
   position: fixed;
@@ -9,7 +12,7 @@ const Behind = styled.div<{ open: boolean }>`
   display: ${props => (props.open ? "block" : "none")};
   width: 100vw;
   height: 100vh;
-  background-color: #00000060;
+  background-color: ${props => props.theme.colors.background.overlay};
 `;
 
 const MainDrawer = styled.div<{ open: boolean }>`
@@ -17,11 +20,11 @@ const MainDrawer = styled.div<{ open: boolean }>`
   height: 100vh;
   display: ${props => (props.open ? "block" : "none")};
   position: fixed;
-  background-color: pink;
+  background-color: ${props => props.theme.colors.main.secondary};
   left: 0;
   top: 0;
   height: 100vh;
-  box-shadow: 0.5rem 0rem 0.5rem green;
+  box-shadow: 0.5rem 0rem 0.5rem ${props => props.theme.colors.main.secondary};
 `;
 
 const Drawer: FunctionComponent = props => {
@@ -29,7 +32,9 @@ const Drawer: FunctionComponent = props => {
 
   return (
     <>
-      <button onClick={() => setOpen(!open)}>BURGER</button>
+      <IconButton onClick={() => setOpen(!open)}>
+        <MdList size={30} />
+      </IconButton>
       <Behind open={open} onClick={() => setOpen(false)}>
         <MainDrawer open={open}>{props.children}</MainDrawer>
       </Behind>

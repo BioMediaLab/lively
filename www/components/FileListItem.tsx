@@ -2,11 +2,12 @@ import React, { useState, useCallback } from "react";
 import { useMutation } from "react-apollo-hooks";
 import gql from "graphql-tag";
 import styled from "styled-components";
-import AreYouSure from "./AreYouSure";
+import AreYouSure from "./ui/AreYouSure";
 import { DeleteFileMute } from "./__generated__/DeleteFileMute";
 import { testClassFiles } from "../queries/__generated__/testClassFiles";
 import { classFilesFragment } from "../queries/classFiles";
 import { classFiles } from "../routes";
+import ControlsButton from "./ui/ControlsButton";
 
 interface FLIProps {
   name: string;
@@ -14,10 +15,17 @@ interface FLIProps {
   id: string;
   classId: string;
   admin?: boolean;
+  showLink?: boolean;
 }
 
+const defaultProps = {
+  admin: false
+};
+
+type DefaultProps = Readonly<typeof defaultProps>;
+
 const FileListItemBody = styled.div`
-  height: 2rem;
+  min-height: 3rem;
   display: flex;
   justify-content: space-between;
   border-bottom: 0.1rem solid #498fff;
@@ -29,21 +37,7 @@ const FileListAction = styled.div`
   padding-left: 0.25rem;
 `;
 
-const ListItemButton = styled.button`
-  border: 0.1rem solid #3ab037;
-  border-radius: 0.5rem;
-  background-color: white;
-  padding: 0.2rem 1rem;
-  margin-top: 0.2rem;
-  cursor: pointer;
-
-  :hover {
-    border: 0.1rem solid #ffcc6f;
-    background-color: #d3d3d3;
-  }
-`;
-
-const FileListItem: React.FC<FLIProps> = props => {
+const FileListItem: React.FC<FLIProps & Partial<DefaultProps>> = props => {
   const [showingConfirm, setShowConf] = useState(false);
   const deleteFile = useMutation<DeleteFileMute>(
     gql`
@@ -95,7 +89,6 @@ const FileListItem: React.FC<FLIProps> = props => {
     [deleteFile]
   );
 
-  const admin = props.admin ? props.admin : false;
   return (
     <>
       <FileListItemBody>
@@ -104,13 +97,13 @@ const FileListItem: React.FC<FLIProps> = props => {
         </classFiles.Link>
         <div style={{ display: "flex" }}>
           <FileListAction>
-            <ListItemButton onClick={opener}>Download</ListItemButton>
+            <ControlsButton onClick={opener}>Download</ControlsButton>
           </FileListAction>
           <FileListAction>
-            {admin ? (
-              <ListItemButton onClick={() => setShowConf(true)}>
+            {props.admin ? (
+              <ControlsButton onClick={() => setShowConf(true)}>
                 Delete
-              </ListItemButton>
+              </ControlsButton>
             ) : (
               <span />
             )}
@@ -127,5 +120,7 @@ const FileListItem: React.FC<FLIProps> = props => {
     </>
   );
 };
+
+FileListItem.defaultProps = defaultProps;
 
 export default FileListItem;

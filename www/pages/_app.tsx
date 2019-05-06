@@ -1,9 +1,12 @@
 import { Container, DefaultAppIProps, AppComponentProps } from "next/app";
 import React from "react";
-import withApolloClient from "../lib/with-apollo-client";
 import { ApolloProvider } from "react-apollo";
 import { ApolloProvider as ApolloHooksProvider } from "react-apollo-hooks";
 import { ApolloClient, NormalizedCacheObject } from "apollo-boost";
+import { ThemeProvider } from "styled-components";
+
+import withApolloClient from "../lib/with-apollo-client";
+import { getTheme, ThemeType } from "../lib/theme";
 
 class MyApp extends React.Component<
   {
@@ -19,11 +22,14 @@ class MyApp extends React.Component<
   */
   render() {
     const { Component, pageProps, apolloClient } = this.props;
+    const theme = getTheme(ThemeType.Light);
     return (
       <Container>
         <ApolloProvider client={apolloClient}>
           <ApolloHooksProvider client={apolloClient}>
-            <Component {...pageProps} />
+            <ThemeProvider theme={theme}>
+              <Component {...pageProps} />
+            </ThemeProvider>
           </ApolloHooksProvider>
         </ApolloProvider>
       </Container>

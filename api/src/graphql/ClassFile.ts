@@ -1,6 +1,7 @@
 import { objectType } from 'yoga'
 import { User } from './User'
 import { Class } from './Class'
+import { ClassUnit } from './ClassUnit'
 
 export const ClassFile = objectType({
   name: 'ClassFile',
@@ -15,9 +16,13 @@ export const ClassFile = objectType({
 
     t.string('file_name')
 
-    t.string('class_id')
+    t.id('class_id')
 
-    t.string('uploader_id')
+    t.id('uploader_id')
+
+    t.id('unit_id')
+
+    t.int('order', { nullable: true })
 
     t.string('description', { nullable: true })
 
@@ -41,6 +46,16 @@ export const ClassFile = objectType({
         return context
           .knex('classes')
           .where({ id: root.class_id })
+          .first()
+      },
+    })
+
+    t.field('unit', {
+      type: ClassUnit,
+      resolve: async (root, _, ctx) => {
+        return ctx
+          .knex('class_units')
+          .where({ id: root.unit_id })
           .first()
       },
     })

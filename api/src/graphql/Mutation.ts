@@ -1,4 +1,5 @@
-import { mutationType, stringArg, idArg, arg, booleanArg } from 'yoga'
+import { mutationType, stringArg, idArg, arg, booleanArg, intArg } from 'yoga'
+
 import { Session } from './Session'
 import { setCredentialsFromCode, getProfileData } from '../lib/googleAuth'
 import { addSession, deleteSession } from '../lib/sessions'
@@ -6,6 +7,8 @@ import { Quiz } from './Quiz'
 import { User } from './User'
 import { FileUpload } from './inputs'
 import { ClassFile } from './ClassFile'
+import { ClassUnit } from './ClassUnit'
+import { knex } from '../db'
 
 export const Mutation = mutationType({
   definition(t) {
@@ -106,10 +109,12 @@ export const Mutation = mutationType({
       args: {
         file: arg({ type: FileUpload, required: true }),
         class_id: idArg(),
+        unit_id: idArg(),
         description: stringArg({ required: false }),
+        order: intArg({ nullable: true }),
       },
       resolve: async (_, args, context) => {
-        const { description, class_id } = args
+        const { description, class_id, unit_id, order } = args
         const { createReadStream, mimetype, filename } = await args.file.file
         const name = args.file.name ? args.file.name : filename
         const { url, key, bucket } = await context.objectStorage.uploadFile(
@@ -117,6 +122,12 @@ export const Mutation = mutationType({
           createReadStream(),
           mimetype,
         )
+        // here we must determine the proper order if none is given
+        const { max } = await knex('class_files')
+          .where({ unit_id: args.unit_id })
+          .max('order')
+          .first()
+
         const inserts = await context
           .knex('class_files')
           .insert({
@@ -125,6 +136,8 @@ export const Mutation = mutationType({
             mimetype,
             description,
             class_id,
+            unit_id,
+            order: order ? order : max ? max + 1 : 0,
             uploader_id: context.user.id,
             file_name: name,
             file_key: key,
@@ -173,21 +186,71 @@ export const Mutation = mutationType({
         file_id: idArg(),
         name: stringArg({ required: false }),
         description: stringArg({ required: false }),
+        order: intArg({ required: false }),
+        unit_id: idArg({ required: false }),
       },
       resolve: async (_, { file_id, ...args }, ctx) => {
+        const oldFile = await ctx
+          .knex('class_files')
+          .where({ id: file_id })
+          .first()
+
+        if ('unit_id' in args) {
+          if (args.unit_id != oldFile.unit_id) {
+            const { count } = await ctx
+              .knex('class_files')
+              .where({ unit_id: args.unit_id })
+              .count('id')
+              .first()
+            await ctx
+              .knex('class_files')
+              .where({ id: file_id })
+              .update({
+                unit_id: args.unit_id,
+                order: count,
+              })
+            oldFile.order = count
+            oldFile.unit_id = args.unit_id
+          }
+        }
+
+        if ('order' in args && !args.order == oldFile.order) {
+          const delta = oldFile.order > args.order ? 1 : -1
+          const range = [oldFile.order, args.order].sort()
+          await ctx
+            .knex('class_files')
+            .where({ unit_id: oldFile.unit_id })
+            .andWhereBetween('order', range as any)
+            .andWhereNot({ id: file_id })
+            .increment('order', delta)
+
+          await ctx
+            .knex('class_files')
+            .where({ id: file_id })
+            .update({
+              order: args.order,
+            })
+
+          oldFile.order = args.order
+        }
+
         const updateParams: any = {}
         if (args.name) {
           updateParams.file_name = args.name
+          oldFile.file_name = args.name
         }
         if (args.description) {
           updateParams.description = args.description
+          oldFile.description = args.description
         }
-        const updatedFiles = await ctx
-          .knex('class_files')
-          .where({ id: file_id })
-          .update(updateParams)
-          .returning('*')
-        return updatedFiles[0]
+        if (Object.keys(updateParams).length > 0) {
+          await ctx
+            .knex('class_files')
+            .where({ id: file_id })
+            .update(updateParams)
+        }
+
+        return oldFile
       },
     })
 
@@ -233,7 +296,7 @@ export const Mutation = mutationType({
         pic: arg({ type: FileUpload, required: true }),
       },
       resolve: async (root, args, context) => {
-        const { createReadStream, mimetype, filename } = await args.pic.file
+        const { createReadStream, mimetype } = await args.pic.file
         const { url, key } = await context.objectStorage.uploadFile(
           context.objectStorage.getPublicBucket(),
           createReadStream(),
@@ -258,6 +321,138 @@ export const Mutation = mutationType({
           .update({ photo_key: key, photo_url: url })
           .returning('*')
         return newPic[0]
+      },
+    })
+
+    t.field('createClassUnit', {
+      type: ClassUnit,
+      args: {
+        name: stringArg(),
+        description: stringArg({ nullable: true }),
+        class_id: idArg(),
+        auto_deploy: booleanArg({ nullable: true }),
+      },
+      resolve: async (_, args, ctx) => {
+        const deployed = args.auto_deploy ? args.auto_deploy : false
+        const { max } = await ctx
+          .knex('class_units')
+          .where({ class_id: args.class_id })
+          .max('order')
+          .first()
+        console.log(max)
+        const res = await ctx
+          .knex('class_units')
+          .insert({
+            name: args.name,
+            description: args.description,
+            class_id: args.class_id,
+            creator_id: ctx.user.id,
+            order: max ? max + 1 : 0,
+            deployed,
+          })
+          .returning('*')
+        return res[0]
+      },
+    })
+
+    t.field('updateClassUnit', {
+      type: ClassUnit,
+      args: {
+        unit_id: idArg(),
+        name: stringArg({ nullable: true }),
+        description: stringArg({ nullable: true }),
+        add_files: idArg({ nullable: true, list: true }),
+        deploy: booleanArg({ nullable: true }),
+        order: intArg({ nullable: true }),
+      },
+      resolve: async (_, args, ctx) => {
+        let updatedUnit: any = null
+
+        console.log(args)
+        let oldOrder
+        if (
+          'name' in args ||
+          'description' in args ||
+          'deploy' in args ||
+          'order' in args
+        ) {
+          const updateBody: any = {}
+          if (args.name) {
+            updateBody.name = args.name
+          }
+          if (args.description) {
+            updateBody.description = args.description
+          }
+          if (args.deploy) {
+            updateBody.deployed = args.deploy
+          }
+
+          if ('order' in args) {
+            updateBody.order = args.order
+            oldOrder = (await ctx
+              .knex('class_units')
+              .where({ id: args.unit_id })
+              .select('order')
+              .first()).order
+          }
+          const res = await ctx
+            .knex('class_units')
+            .where({ id: args.unit_id })
+            .update(updateBody)
+            .returning('*')
+          updatedUnit = res[0]
+        }
+        if (args.add_files) {
+          await ctx
+            .knex('class_files')
+            .whereIn('id', args.add_files)
+            .update({ unit_id: args.unit_id })
+        }
+        if (!updatedUnit) {
+          updatedUnit = await ctx
+            .knex('class_units')
+            .where({ id: args.unit_id })
+        }
+
+        // increment the order on all higher
+        if ('order' in args) {
+          const delta = oldOrder > args.order ? 1 : -1
+          const range = [oldOrder, args.order].sort()
+          await ctx
+            .knex('class_units')
+            .where({ class_id: updatedUnit.class_id })
+            .andWhereBetween('order', range as any)
+            .andWhereNot({ id: args.unit_id })
+            .increment('order', delta)
+        }
+
+        return updatedUnit
+      },
+    })
+
+    t.boolean('rmClassUnit', {
+      args: { unit_id: idArg() },
+      resolve: async (_, { unit_id }, ctx) => {
+        // get info about the unit as we delete it
+        const [{ class_id, order }] = await ctx
+          .knex('class_units')
+          .where({ id: unit_id })
+          .del()
+          .returning(['order', 'class_id'])
+        // change the order of the other class units
+        await ctx
+          .knex('class_units')
+          .where({
+            class_id,
+          })
+          .andWhere('order', '>', order)
+          .decrement('order')
+        // delete all of the unit's files
+        await ctx
+          .knex('class_files')
+          .where({ unit_id })
+          .del()
+        return true
       },
     })
   },

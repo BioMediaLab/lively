@@ -36,8 +36,7 @@ const readBlobAsText = (blob: Blob): Promise<string> =>
 const readData = async (url: string): Promise<ReadDataRes> => {
   const resp = await fetch(url);
   const blob = await resp.blob();
-  console.log(blob.type);
-  if (/(text\/)|(application\/jso)\w+/.test(blob.type)) {
+  if (/(text\/)|(application\/(jso|x-yam|yam))\w+/.test(blob.type)) {
     return {
       type: "text",
       data: await readBlobAsText(blob)

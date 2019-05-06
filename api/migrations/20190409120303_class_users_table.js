@@ -16,7 +16,7 @@ exports.up = function(knex, Promise) {
       .references('id')
       .inTable('classes')
       .notNull()
-    t.timestamps()
+    t.timestamps(false, true)
   })
 }
 
