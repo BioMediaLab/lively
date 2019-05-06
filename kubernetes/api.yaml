@@ -31,6 +31,26 @@ spec:
               value: "6379"
             - name: GOOGLE_APP_REDIRECT_URL
               value: "https://lively.im/login"
+            - name: FILE_STORAGE_ENDPOINT
+              valueFrom:
+                secretKeyRef:
+                  name: storage
+                  key: endpoint
+            - name: FILE_STORAGE_ID
+              valueFrom:
+                secretKeyRef:
+                  name: storage
+                  key: id 
+            - name: FILE_STORAGE_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: storage
+                  key: secret
+            - name: PUBLIC_STORAGE_BUCKET
+              valueFrom:
+                secretKeyRef:
+                  name: storage
+                  key: bucket
             - name: PROD_DB_STRING
               valueFrom:
                 secretKeyRef:

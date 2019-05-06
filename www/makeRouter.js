@@ -68,7 +68,11 @@ const handleServerRequest = (routes, server, app) => {
   Object.keys(routes).forEach(key => {
     const props = routes[key]._serverRoute;
     server.get(props.path, (req, res) => {
-      return app.render(req, res, props.page, req.params);
+      // When NextJS is in prod mode, it is required
+      // that the page name start with a "/"
+      // (but dev mode doesn't care? This may be a bug?)
+      const corPage = props.page[0] === "/" ? props.page : `/${props.page}`;
+      return app.render(req, res, corPage, req.params);
     });
   });
 
