@@ -6,7 +6,17 @@ const IconButton = styled.button<{}>`
   font-size: 120%;
   height: 2rem;
   border-radius: 0.5rem;
-  border: 0.1rem solid #a3ff84;
+  background-color: #00000010;
+  border: 0.1rem solid ${props => props.theme.colors.main.secondary};
+
+  :hover {
+    border-color: ${p => p.theme.colors.main.accent};
+    background-color: #00000030;
+  }
+  :active {
+    border-color: ${p => p.theme.colors.main.accent};
+    background-color: #00000030;
+  }
 `;
 
 export default IconButton;

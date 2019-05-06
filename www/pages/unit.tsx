@@ -3,6 +3,7 @@ import { NextFunctionComponent } from "next";
 import styled from "styled-components";
 import gql from "graphql-tag";
 import { useQuery } from "react-apollo-hooks";
+import { MdHome } from "react-icons/md";
 
 import makePage from "../lib/makePage";
 import { classUnits, classesRoute } from "../routes";
@@ -10,6 +11,7 @@ import ErrorMessage from "../components/ErrorMessage";
 import ClassUnitList from "../components/ClassUnitList";
 import ClassFiles from "../components/ClassFiles";
 import { FullUnit, FullUnitVariables } from "./__generated__/FullUnit";
+import NextUnitButton from "../components/NextUnitButton";
 
 const UnitQueryAST = gql`
   query FullUnit($cls: ID!, $unit: ID!) {
@@ -25,19 +27,6 @@ const UnitQueryAST = gql`
   }
 `;
 
-/*const NextUnitAST = gql`
-  query NextUnit($cls: ID!, $order: Int!) {
-    class(class_id: $cls) {
-      id
-      unitByOrder(order: $order) {
-        id
-        name
-        order
-      }
-    }
-  }
-`;*/
-
 const UnitViewBody = styled.div`
   display: grid;
   grid-template-columns: repeat(12, 1fr);
@@ -52,7 +41,7 @@ const PrevUnitChange = styled.div`
 `;
 
 const NextUnitChange = styled.div`
-  grid-column: 9/13;
+  grid-column: 8/12;
   grid-row: 1;
 `;
 
@@ -64,11 +53,14 @@ const CourseHome = styled.div`
 const LeftInfo = styled.div`
   grid-column: 1/4;
   grid-row: 2/13;
+  background-color: ${p => p.theme.colors.background.secondary};
+  padding-left: 2rem;
 `;
 
 const MainContext = styled.div`
-  grid-column: 5/13;
+  grid-column: 4/13;
   grid-row: 2/13;
+  padding-left: 2rem;
 `;
 
 interface Props {
@@ -112,13 +104,39 @@ const Index: NextFunctionComponent<Props> = props => {
 
   return (
     <UnitViewBody>
-      <PrevUnitChange>Prev</PrevUnitChange>
+      <PrevUnitChange>
+        <NextUnitButton
+          classId={props.classId}
+          order={
+            typeof data.class.unit.order === "number"
+              ? data.class.unit.order - 1
+              : -1
+          }
+        >
+          Previous
+        </NextUnitButton>
+      </PrevUnitChange>
       <CourseHome>
         <classesRoute.Link path={`/classes/${props.classId}`}>
-          Class Home
+          <a>
+            <div>
+              <MdHome /> Class Home
+            </div>
+          </a>
         </classesRoute.Link>
       </CourseHome>
-      <NextUnitChange>Next</NextUnitChange>
+      <NextUnitChange>
+        <NextUnitButton
+          classId={props.classId}
+          order={
+            typeof data.class.unit.order === "number"
+              ? data.class.unit.order + 1
+              : -1
+          }
+        >
+          Next
+        </NextUnitButton>
+      </NextUnitChange>
       <LeftInfo>
         <h2>{data.class.unit.name}</h2>
         <p>{data.class.unit.description}</p>

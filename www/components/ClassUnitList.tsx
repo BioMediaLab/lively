@@ -6,6 +6,7 @@ import ErrorMessage from "./ErrorMessage";
 import { ClassUnits, ClassUnitsVariables } from "./__generated__/ClassUnits";
 import styled from "styled-components";
 import ClassFiles from "./ClassFiles";
+import ControlsButton from "./ui/ControlsButton";
 
 const getClassUnits = gql`
   query ClassUnits($class_id: ID!, $dep: Boolean!) {
@@ -26,7 +27,7 @@ const getClassUnits = gql`
 `;
 
 const Body = styled.div`
-  border-left: 1rem solid green;
+  border-left: 1rem solid ${p => p.theme.colors.main.secondary};
   height: 100%;
   min-width: 50rem;
   margin: -2rem;
@@ -45,7 +46,7 @@ const ListItem = styled.div`
 `;
 
 const ListItemTop = styled.div`
-  border: 0.2px solid green;
+  border: 0.2px solid ${p => p.theme.colors.main.secondary};
   border-radius: 0 1rem 1rem 0;
   display: flex;
   height: 4rem;
@@ -57,18 +58,18 @@ const ListItemTitle = styled.div`
   width: 100%;
   border-radius: 0 1rem 1rem 0;
   :hover {
-    background-color: magenta;
+    background-color: ${p => p.theme.colors.main.accent};
   }
 `;
 
 const ItemDropdownButton = styled.button`
-  background-color: gray;
+  background-color: ${p => p.theme.colors.background.secondary};
   border: none;
   width: 2rem;
   height: 100%;
 
   :hover {
-    background-color: red;
+    background-color: ${p => p.theme.colors.main.accent};
   }
 
   :active {
@@ -121,13 +122,13 @@ const ClassUnitList: React.FC<Props> = props => {
   const role = data.class.myRole.role;
   const adminButton =
     props.showEdit && (role === "ADMIN" || role === "PROFESSOR") ? (
-      <button
+      <ControlsButton
         onClick={() => {
           editUnits.push(`/classes/${props.classId}/edit`);
         }}
       >
         Edit
-      </button>
+      </ControlsButton>
     ) : (
       <span />
     );

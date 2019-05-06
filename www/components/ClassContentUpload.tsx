@@ -50,7 +50,7 @@ const UploadUIBody = styled.div`
   height: 15rem;
   padding: 0.5rem;
   display: flex;
-  border: 0.1rem solid #049b00;
+  border: 0.1rem solid ${p => p.theme.colors.main.primary};
   border-radius: 0.5rem;
   margin: 1rem;
 `;

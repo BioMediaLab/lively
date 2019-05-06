@@ -7,11 +7,12 @@ import { UnitEditDispatch } from "./stateManager";
 
 const FileItemBody = styled.div<{ dragging: boolean }>`
   min-height: 3rem;
-  border: 0.2rem solid lightgoldenrodyellow;
+  border: 0.2rem solid ${p => p.theme.colors.main.accent};
   border-radius: 1rem;
-  margin: 1rem 0;
+  margin: 1rem 1rem;
   padding-left: 1rem;
-  background-color: ${props => (props.dragging ? "lightgrey" : "white")};
+  background-color: ${props =>
+    props.dragging ? "lightgrey" : props.theme.colors.background.primary};
 `;
 
 export interface File {

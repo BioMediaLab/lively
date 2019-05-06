@@ -23,16 +23,23 @@ const Body = styled.div<{ isDragging: boolean }>`
   max-width: 40rem;
   height: 100%;
   margin: 0 1rem;
-  border: 1px solid ${props => (props.isDragging ? "red" : "orange")};
+  border: 1px solid
+    ${props =>
+      props.isDragging
+        ? props.theme.colors.main.accent
+        : props.theme.colors.main.altAccent};
   border-radius: 1rem;
   padding: 1rem;
-  background-color: white;
+  background-color: ${p => p.theme.colors.background.primary};
 `;
 
 const Top = styled.div<{ isDragging: boolean }>`
   min-height: 2rem;
-  background-color: ${props => (props.isDragging ? "red" : "white")};
-  border-bottom: 1px solid black;
+  background-color: ${props =>
+    props.isDragging
+      ? props.theme.colors.background.secondary
+      : props.theme.colors.background.primary};
+  border-bottom: 1px solid ${p => p.theme.colors.main.secondary};
 `;
 
 const Controls = styled.div`

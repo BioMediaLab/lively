@@ -2,20 +2,23 @@ import React from "react";
 import styled from "styled-components";
 import Head from "next/head";
 import Link from "next/link";
-import { Image, Button } from "rebass";
+import { Image } from "rebass";
+import { useMutation } from "react-apollo-hooks";
+import gql from "graphql-tag";
+import "normalize.css";
+
 import { deleteSessionFrontend } from "../lib/session";
 import Login from "./Login";
 import Drawer from "./ui/Drawer";
 import ClassList from "./ClassList";
-import { useMutation } from "react-apollo-hooks";
-import gql from "graphql-tag";
+import ControlsButton from "./ui/ControlsButton";
 
 const HeaderStyles = styled.header`
   display: flex;
   height: 3rem;
   padding: 1rem;
-  background-color: #fcff77;
-  box-shadow: 0 0.25rem 0.25rem teal;
+  background-color: ${props => props.theme.colors.main.primary};
+  box-shadow: 0 0.25rem 0.25rem ${props => props.theme.colors.main.secondary};
   position: fixed;
   top: 0;
   left: 0;
@@ -27,6 +30,12 @@ const HeaderStyles = styled.header`
 const Logo = styled.div`
   margin-left: 2rem;
   width: 15%;
+`;
+
+const Main = styled.main`
+  background-color: ${props => props.theme.colors.background.primary};
+  color: ${props => props.theme.colors.text.primary};
+  font-family: ${p => p.theme.text.family};
 `;
 
 interface Props {
@@ -59,7 +68,7 @@ const Layout: React.FunctionComponent<Props> = props => {
               />
             </Link>
           </Logo>
-          <Button
+          <ControlsButton
             onClick={() => {
               logout().finally(() => {
                 deleteSessionFrontend();
@@ -68,12 +77,12 @@ const Layout: React.FunctionComponent<Props> = props => {
             }}
           >
             Logout
-          </Button>
+          </ControlsButton>
           <Link href="/settings">
-            <button>Settings</button>
+            <ControlsButton>Settings</ControlsButton>
           </Link>
         </HeaderStyles>
-        <main style={{ paddingTop: "5rem" }}>{props.children}</main>
+        <Main style={{ paddingTop: "5rem" }}>{props.children}</Main>
       </div>
     );
   } else {

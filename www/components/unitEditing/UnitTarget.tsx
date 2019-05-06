@@ -11,7 +11,10 @@ interface Props {
 const ItemHolder = styled.div<{ dropping: boolean }>`
   padding-top: 1rem;
   min-height: 70vh;
-  background-color: ${props => (props.dropping ? "grey" : "white")};
+  background-color: ${props =>
+    props.dropping
+      ? props.theme.colors.background.secondary
+      : props.theme.colors.background.primary};
 `;
 
 const UnitTarget: React.FC<Props> = props => {

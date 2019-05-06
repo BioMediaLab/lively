@@ -163,34 +163,40 @@ const ClassFiles: NextFC<Props> = props => {
     );
   } else {
     topSection = (
-      <div style={{ display: "flex" }}>
-        {myRole === "ADMIN" || myRole === "PROFESSOR" ? (
-          <div>
-            <IconButton
-              onClick={() => setState(state => ({ ...state, isEditing: true }))}
-            >
-              <MdEdit />
-            </IconButton>
-          </div>
-        ) : (
-          <span />
-        )}
+      <div>
         <div>
-          <div>
-            <classesRoute.Link path={`/classes/${props.classId}`}>
-              {data.classFile.class.name}
-            </classesRoute.Link>
-            {" > "}
-            <classUnits.Link
-              path={`/classes/${props.classId}/units/${data.classFile.unit.id}`}
-            >
-              {data.classFile.unit.name}
-            </classUnits.Link>
-            {" > "}
-            {state.nameField}
-          </div>
-          <small>{data.classFile.description}</small>
+          <nav>
+            <ol style={{ paddingLeft: "1rem", listStyleType: "none" }}>
+              <classesRoute.Link path={`/classes/${props.classId}`}>
+                {data.classFile.class.name}
+              </classesRoute.Link>
+              {" > "}
+              <classUnits.Link
+                path={`/classes/${props.classId}/units/${
+                  data.classFile.unit.id
+                }`}
+              >
+                {data.classFile.unit.name}
+              </classUnits.Link>
+              {" > "}
+              {state.nameField}
+            </ol>
+          </nav>
+          {myRole === "ADMIN" || myRole === "PROFESSOR" ? (
+            <div>
+              <IconButton
+                onClick={() =>
+                  setState(state => ({ ...state, isEditing: true }))
+                }
+              >
+                <MdEdit />
+              </IconButton>
+            </div>
+          ) : (
+            <span />
+          )}
         </div>
+        <small>{data.classFile.description}</small>
       </div>
     );
   }

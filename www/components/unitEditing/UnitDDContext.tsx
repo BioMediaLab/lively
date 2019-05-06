@@ -37,7 +37,7 @@ const UnitsHolder = styled.div`
 
 const TopBar = styled.div`
   display: flex;
-  background-color: lemonchiffon;
+  background-color: ${p => p.theme.colors.background.secondary};
   width: 120%;
   margin-left: -2rem;
   padding: 5rem 0 1rem 3rem;

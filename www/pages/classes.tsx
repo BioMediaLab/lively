@@ -25,7 +25,7 @@ const ClassMain = styled.div`
 `;
 
 const ClassLeft = styled.div`
-  background-color: #d3d3d3;
+  background-color: ${p => p.theme.colors.background.secondary};
   width: 34%;
   min-height: 90vh;
   margin-left: -2rem;
