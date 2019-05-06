@@ -12,10 +12,10 @@ import gql from "graphql-tag";
 
 const HeaderStyles = styled.header`
   display: flex;
+  justify-content: space-around;
   height: 3rem;
   padding: 1rem;
-  background-color: #fcff77;
-  box-shadow: 0 0.25rem 0.25rem teal;
+  box-shadow: 0 0.25rem 0.25rem grey;
   position: fixed;
   top: 0;
   left: 0;
@@ -25,8 +25,17 @@ const HeaderStyles = styled.header`
 `;
 
 const Logo = styled.div`
-  margin-left: 2rem;
-  width: 15%;
+  position: absolute;
+  top: 50%;
+  transform: translate(-70%, -40%);
+  left: 50%;
+  z-index: 11;
+`;
+
+const ButtonsContainer = styled.div`
+  display: flex;
+  flex: 1;
+  justify-content: space-evenly;
 `;
 
 interface Props {
@@ -47,32 +56,33 @@ const Layout: React.FunctionComponent<Props> = props => {
     child = (
       <div>
         <HeaderStyles>
-          <Drawer>
-            <ClassList />
-          </Drawer>
+          <ButtonsContainer>
+            <Drawer>
+              <ClassList />
+            </Drawer>
+          </ButtonsContainer>
           <Logo>
             <Link href="/">
-              <Image
-                width={[1, 1, 1 / 2]}
-                src="/static/lively@2x.png"
-                alt="lively"
-              />
+              <img height="48" src="/static/lively@2x.png" alt="lively" />
             </Link>
           </Logo>
-          <Button
-            onClick={() => {
-              logout().finally(() => {
-                deleteSessionFrontend();
-                window.location.reload(true);
-              });
-            }}
-          >
-            Logout
-          </Button>
-          <Link href="/settings">
-            <button>Settings</button>
-          </Link>
+          <ButtonsContainer>
+            <Link href="/settings">
+              <button>Settings</button>
+            </Link>
+            <Button
+              onClick={() => {
+                logout().finally(() => {
+                  deleteSessionFrontend();
+                  window.location.reload(true);
+                });
+              }}
+            >
+              Logout
+            </Button>
+          </ButtonsContainer>
         </HeaderStyles>
+
         <main style={{ paddingTop: "5rem" }}>{props.children}</main>
       </div>
     );
