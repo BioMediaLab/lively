@@ -76,19 +76,21 @@ const Layout: React.FunctionComponent<Props> = props => {
               <img height="48" src="/static/lively@2x.png" alt="lively" />
             </Link>
           </Logo>
-          <ControlsButton
-            onClick={() => {
-              logout().finally(() => {
-                deleteSessionFrontend();
-                window.location.reload(true);
-              });
-            }}
-          >
-            Logout
-          </ControlsButton>
-          <Link href="/settings">
-            <ControlsButton>Settings</ControlsButton>
-          </Link>
+          <ButtonsContainer>
+            <Link href="/settings">
+              <ControlsButton>Settings</ControlsButton>
+            </Link>
+            <ControlsButton
+              onClick={() => {
+                logout().finally(() => {
+                  deleteSessionFrontend();
+                  window.location.reload(true);
+                });
+              }}
+            >
+              Logout
+            </ControlsButton>
+          </ButtonsContainer>
         </HeaderStyles>
         <Main style={{ paddingTop: "5rem" }}>{props.children}</Main>
       </div>

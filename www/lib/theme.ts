@@ -20,8 +20,8 @@ export const getTheme = (type: ThemeType): DefaultTheme => {
             disabled: "#706161"
           },
           main: {
-            primary: "#44B53F",
-            secondary: "#7986CB",
+            primary: "#FFFFFF",
+            secondary: "#D5D8DC",
             accent: "#FF4B8B",
             altAccent: "orange",
             disabled: "#c9c9c9"
