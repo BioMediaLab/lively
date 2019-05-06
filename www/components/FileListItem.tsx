@@ -7,6 +7,7 @@ import { DeleteFileMute } from "./__generated__/DeleteFileMute";
 import { testClassFiles } from "../queries/__generated__/testClassFiles";
 import { classFilesFragment } from "../queries/classFiles";
 import { classFiles } from "../routes";
+import ControlsButton from "./ui/ControlsButton";
 
 interface FLIProps {
   name: string;
@@ -34,20 +35,6 @@ const FileListItemBody = styled.div`
 
 const FileListAction = styled.div`
   padding-left: 0.25rem;
-`;
-
-const ListItemButton = styled.button`
-  border: 0.1rem solid #3ab037;
-  border-radius: 0.5rem;
-  background-color: white;
-  padding: 0.2rem 1rem;
-  margin-top: 0.2rem;
-  cursor: pointer;
-
-  :hover {
-    border: 0.1rem solid #ffcc6f;
-    background-color: #d3d3d3;
-  }
 `;
 
 const FileListItem: React.FC<FLIProps & Partial<DefaultProps>> = props => {
@@ -110,13 +97,13 @@ const FileListItem: React.FC<FLIProps & Partial<DefaultProps>> = props => {
         </classFiles.Link>
         <div style={{ display: "flex" }}>
           <FileListAction>
-            <ListItemButton onClick={opener}>Download</ListItemButton>
+            <ControlsButton onClick={opener}>Download</ControlsButton>
           </FileListAction>
           <FileListAction>
             {props.admin ? (
-              <ListItemButton onClick={() => setShowConf(true)}>
+              <ControlsButton onClick={() => setShowConf(true)}>
                 Delete
-              </ListItemButton>
+              </ControlsButton>
             ) : (
               <span />
             )}

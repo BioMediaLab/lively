@@ -14,7 +14,7 @@ const Pages = styled.div`
 
 const PdfPage = createGlobalStyle`
   .pdfPage {
-    border: 1rem solid gray;
+    border: 1rem solid ${p => p.theme.colors.background.secondary};
   }
 `;
 

@@ -3,7 +3,7 @@ import gql from "graphql-tag";
 import { useQuery } from "react-apollo-hooks";
 
 import { classUnits } from "../routes";
-import { NextUnit, NextUnitVariables } from "../pages/__generated__/NextUnit";
+import { NextUnit, NextUnitVariables } from "./__generated__/NextUnit";
 import styled from "styled-components";
 
 const Body = styled.button`

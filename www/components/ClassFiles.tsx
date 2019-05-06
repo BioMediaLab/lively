@@ -10,13 +10,15 @@ import ClassContentUpload from "./ClassContentUpload";
 import FileListItem from "./FileListItem";
 import styled from "styled-components";
 
-const ListBody = styled.div``;
-
 interface Props {
   class_id: string;
   unit_id: string;
   showUploader?: boolean;
 }
+
+const Title = styled.h6`
+  margin: 0;
+`;
 
 const ClassFiles: React.FC<Props> = ({ class_id, unit_id, showUploader }) => {
   const { data, error, loading } = useQuery<
@@ -70,9 +72,9 @@ const ClassFiles: React.FC<Props> = ({ class_id, unit_id, showUploader }) => {
 
   return (
     <div>
-      <div>Class Files for {data.myClassRole.class.unit.name}</div>
+      <Title>Class Files for {data.myClassRole.class.unit.name}</Title>
       {upload}
-      <ListBody>
+      <div>
         {data.myClassRole.class.unit.files.map(file => (
           <FileListItem
             key={file.id}
@@ -83,7 +85,7 @@ const ClassFiles: React.FC<Props> = ({ class_id, unit_id, showUploader }) => {
             classId={class_id}
           />
         ))}
-      </ListBody>
+      </div>
     </div>
   );
 };

@@ -46,7 +46,7 @@ const ListItem = styled.div`
 `;
 
 const ListItemTop = styled.div`
-  border: 0.2px solid ${p => p.theme.colors.main.secondary};
+  border: 0.2rem solid ${p => p.theme.colors.main.primary};
   border-radius: 0 1rem 1rem 0;
   display: flex;
   height: 4rem;
@@ -79,8 +79,8 @@ const ItemDropdownButton = styled.button`
 
 const ListBody = styled.div`
   margin-left: 4rem;
-  border-left: 0.2rem solid green;
-  border-bottom: 0.2rem solid green;
+  border-left: 0.5rem solid ${p => p.theme.colors.main.primary};
+  border-bottom: 0.5rem solid ${p => p.theme.colors.main.primary};
   border-bottom-left-radius: 1rem;
   padding-left: 1rem;
   padding-bottom: 1rem;
