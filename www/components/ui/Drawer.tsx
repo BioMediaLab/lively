@@ -4,6 +4,7 @@ import styled from "styled-components";
 import { MdList } from "react-icons/md";
 
 import IconButton from "./IconButton";
+import BorderlessIconButton from "./BorderlessIconButton";
 
 const Behind = styled.div<{ open: boolean }>`
   position: fixed;
@@ -32,9 +33,9 @@ const Drawer: FunctionComponent = props => {
 
   return (
     <>
-      <IconButton onClick={() => setOpen(!open)}>
+      <BorderlessIconButton onClick={() => setOpen(!open)}>
         <MdList size={30} />
-      </IconButton>
+      </BorderlessIconButton>
       <Behind open={open} onClick={() => setOpen(false)}>
         <MainDrawer open={open}>{props.children}</MainDrawer>
       </Behind>

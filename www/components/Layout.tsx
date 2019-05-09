@@ -12,33 +12,47 @@ import Login from "./Login";
 import Drawer from "./ui/Drawer";
 import ClassList from "./ClassList";
 import ControlsButton from "./ui/ControlsButton";
+import BorderlessButton from "./ui/BorderlessButton";
 
 const HeaderStyles = styled.header`
   display: flex;
   justify-content: space-around;
-  height: 3rem;
-  padding: 1rem;
+  height: 5rem;
   background-color: ${props => props.theme.colors.main.primary};
   box-shadow: 0 0.25rem 0.25rem ${props => props.theme.colors.main.secondary};
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
-  align-items: center;
+  align-items: stretch;
   z-index: 10;
 `;
 
-const Logo = styled.div`
+const LogoOld = styled.div`
   position: absolute;
   top: 50%;
   transform: translate(-70%, -40%);
-  left: 50%;
+  left: 25%;
   z-index: 11;
+`;
+
+const Logo = styled.div`
+  display: flex;
+  flex: 1.5;
+  justify-content: center;
+  align-items: center;
+`;
+
+const DrawerContainer = styled.div`
+  display: flex;
+  flex: 1;
+  justify-content: center;
+  align-items: center;
 `;
 
 const ButtonsContainer = styled.div`
   display: flex;
-  flex: 1;
+  flex: 4;
   justify-content: space-evenly;
 `;
 
@@ -66,21 +80,24 @@ const Layout: React.FunctionComponent<Props> = props => {
     child = (
       <div>
         <HeaderStyles>
-          <ButtonsContainer>
+          <DrawerContainer>
             <Drawer>
               <ClassList />
             </Drawer>
-          </ButtonsContainer>
+          </DrawerContainer>
           <Logo>
             <Link href="/">
               <img height="48" src="/static/lively@2x.png" alt="lively" />
             </Link>
           </Logo>
           <ButtonsContainer>
+            <BorderlessButton>Button</BorderlessButton>
+            <BorderlessButton>Button</BorderlessButton>
+
             <Link href="/settings">
-              <ControlsButton>Settings</ControlsButton>
+              <BorderlessButton>Settings</BorderlessButton>
             </Link>
-            <ControlsButton
+            <BorderlessButton
               onClick={() => {
                 logout().finally(() => {
                   deleteSessionFrontend();
@@ -89,7 +106,7 @@ const Layout: React.FunctionComponent<Props> = props => {
               }}
             >
               Logout
-            </ControlsButton>
+            </BorderlessButton>
           </ButtonsContainer>
         </HeaderStyles>
         <Main style={{ paddingTop: "5rem" }}>{props.children}</Main>

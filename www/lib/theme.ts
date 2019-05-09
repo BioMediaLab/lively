@@ -21,7 +21,7 @@ export const getTheme = (type: ThemeType): DefaultTheme => {
           },
           main: {
             primary: "#FFFFFF",
-            secondary: "#D5D8DC",
+            secondary: "#DEDEDE",
             accent: "#FF4B8B",
             altAccent: "orange",
             disabled: "#c9c9c9"
